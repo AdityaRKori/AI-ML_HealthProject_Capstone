@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='28' stroke='%233B82F6' stroke-width='4' fill='none'/><path d='M32 12C32 12 40 24 40 32C40 40 32 52 32 52' stroke='%233B82F6' stroke-width='4' stroke-linecap='round' fill='none'/><path d='M32 12C32 12 24 24 24 32C24 40 32 52 32 52' stroke='%233B82F6' stroke-width='4' stroke-linecap='round' fill='none'/><circle cx='32' cy='32' r='4' fill='%233B82F6'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Oracle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'primary': '#0D1B2A',
+              'secondary': '#1B263B',
+              'accent': '#415A77',
+              'light': '#E0E1DD',
+              'highlight': '#3B82F6',
+              'success': '#10B981',
+              'warning': '#F59E0B',
+              'danger': '#EF4444',
+            },
+          }
+        }
+      }
+    </script>
+    <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.16.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "recharts": "https://aistudiocdn.com/recharts@^3.1.2",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1"
+  }
+}
+</script>
+</head>
+  <body class="bg-primary text-light">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
