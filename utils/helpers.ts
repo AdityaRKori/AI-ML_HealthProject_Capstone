@@ -1,5 +1,4 @@
-
-import type { UserProfile, CoachSettings } from '../types';
+import type { UserProfile, CoachSettings } from './types';
 
 const USER_PROFILE_KEY = 'oracleHealthUserProfile';
 const COACH_SETTINGS_KEY = 'oracleCoachSettings';
@@ -46,6 +45,32 @@ export function calculateBMI(heightCm: number, weightKg: number): number {
     }
     const heightM = heightCm / 100;
     return weightKg / (heightM * heightM);
+}
+
+export function getBMICategory(bmi: number): { category: string; color: string } {
+    if (bmi < 18.5) return { category: 'Underweight', color: 'text-blue-400' };
+    if (bmi >= 18.5 && bmi <= 24.9) return { category: 'Normal weight', color: 'text-success' };
+    if (bmi >= 25 && bmi <= 29.9) return { category: 'Overweight', color: 'text-warning' };
+    if (bmi > 29.9) return { category: 'Obesity', color: 'text-danger' };
+    return { category: 'N/A', color: 'text-light'};
+}
+
+export function getIdealWeightRange(heightCm: number, currentWeightKg: number): { idealMin: number, idealMax: number, weightToChange: number } {
+    if (heightCm <= 0) return { idealMin: 0, idealMax: 0, weightToChange: 0 };
+    const heightM = heightCm / 100;
+    const idealMin = 18.5 * (heightM * heightM);
+    const idealMax = 24.9 * (heightM * heightM);
+    
+    let weightToChange = 0;
+    if (currentWeightKg > idealMax) {
+        // Calculate weight to lose to get to max of normal range
+        weightToChange = currentWeightKg - idealMax;
+    } else if (currentWeightKg < idealMin) {
+        // Calculate weight to gain to get to min of normal range
+        weightToChange = currentWeightKg - idealMin; // will be negative
+    }
+
+    return { idealMin, idealMax, weightToChange };
 }
 
 export function getBase64(file: File): Promise<{ data: string; mimeType: string; }> {

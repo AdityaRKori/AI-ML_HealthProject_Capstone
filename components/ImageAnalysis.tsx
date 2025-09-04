@@ -10,7 +10,7 @@ import { getBase64 } from '../utils/helpers';
 const ImageAnalysis: React.FC = () => {
     return (
         <div className="space-y-8">
-            <h1 className="text-3xl font-bold text-light">AI-Powered Image Analysis</h1>
+            <h1 className="text-3xl font-bold text-text-primary">AI-Powered Image Analysis</h1>
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <ChestXRayAnalyzer />
                 <SkinLesionAnalyzer />
@@ -63,19 +63,19 @@ const ChestXRayAnalyzer: React.FC = () => {
         }
     };
 
-    const COLORS = ['#10B981', '#F59E0B', '#EF4444', '#8884d8'];
+    const COLORS = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#6366F1'];
 
     return (
         <div className="bg-secondary p-6 rounded-lg shadow-lg">
             <h2 className="text-2xl font-semibold mb-4 text-highlight">Chest X-Ray Analyzer</h2>
-            <p className="text-sm text-light/70 mb-4">Upload a chest X-ray to check for signs of common respiratory conditions. This model is conceptually based on datasets like the "Chest X-Ray Images (Pneumonia)" collection from Kaggle.</p>
+            <p className="text-sm text-light mb-4">Upload a chest X-ray to check for signs of common respiratory conditions. This model is conceptually based on datasets like the "CheXpert" collection.</p>
             
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/png, image/jpeg" className="hidden" />
             
             {!imagePreview && (
                  <button onClick={() => fileInputRef.current?.click()} className="w-full flex flex-col items-center justify-center p-8 border-2 border-dashed border-accent rounded-lg hover:bg-accent/50 transition-colors">
                     {ICONS.upload}
-                    <span className="mt-2 text-sm">Click to upload X-Ray</span>
+                    <span className="mt-2 text-sm text-text-primary">Click to upload X-Ray</span>
                 </button>
             )}
 
@@ -86,11 +86,11 @@ const ChestXRayAnalyzer: React.FC = () => {
             )}
 
             <div className="flex gap-2">
-                <button onClick={handleAnalysis} disabled={!imageFile || isLoading} className="w-full mt-4 bg-highlight text-white font-bold py-3 rounded-lg hover:bg-blue-500 disabled:bg-gray-500 transition-colors">
+                <button onClick={handleAnalysis} disabled={!imageFile || isLoading} className="w-full mt-4 bg-highlight text-white font-bold py-3 rounded-lg hover:opacity-90 disabled:bg-gray-500 transition-colors">
                     {isLoading ? 'Analyzing...' : 'Analyze Image'}
                 </button>
                 {imageFile && 
-                    <button onClick={() => {setImageFile(null); setImagePreview(null); setResult(null);}} disabled={isLoading} className="w-1/3 mt-4 bg-danger text-white font-bold py-3 rounded-lg hover:bg-red-500 disabled:bg-gray-500 transition-colors">
+                    <button onClick={() => {setImageFile(null); setImagePreview(null); setResult(null);}} disabled={isLoading} className="w-1/3 mt-4 bg-danger text-white font-bold py-3 rounded-lg hover:opacity-90 disabled:bg-gray-500 transition-colors">
                         Clear
                     </button>
                 }
@@ -100,7 +100,7 @@ const ChestXRayAnalyzer: React.FC = () => {
 
             {result && result.predictions.length > 0 && (
                 <div className="mt-6">
-                    <h3 className="text-xl font-bold mb-2">Analysis Results</h3>
+                    <h3 className="text-xl font-bold mb-2 text-text-primary">Analysis Results</h3>
                     <div className="w-full h-60">
                         <ResponsiveContainer>
                             <PieChart>
@@ -109,13 +109,13 @@ const ChestXRayAnalyzer: React.FC = () => {
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                                <Tooltip contentStyle={{ backgroundColor: '#1B263B', border: 'none', borderRadius: '0.5rem' }}/>
+                                <Tooltip contentStyle={{ backgroundColor: 'var(--color-secondary)', border: '1px solid var(--color-accent)', borderRadius: '0.5rem' }}/>
                                 <Legend />
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
                     <div className="mt-4 bg-accent p-4 rounded-md">
-                        <p className="text-light/90 whitespace-pre-wrap">{result.explanation}</p>
+                        <p className="text-text-primary whitespace-pre-wrap">{result.explanation}</p>
                     </div>
                 </div>
             )}
@@ -171,14 +171,14 @@ const SkinLesionAnalyzer: React.FC = () => {
     return (
         <div className="bg-secondary p-6 rounded-lg shadow-lg">
             <h2 className="text-2xl font-semibold mb-4 text-highlight">Skin Lesion Classifier</h2>
-            <p className="text-sm text-light/70 mb-4">Upload an image of a skin lesion for a preliminary classification. This is inspired by models trained on datasets like HAM10000.</p>
+            <p className="text-sm text-light mb-4">Upload an image of a skin lesion for a preliminary classification. This is inspired by models trained on datasets like ISIC HAM10000.</p>
             
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/png, image/jpeg" className="hidden" />
 
             {!imagePreview && (
                 <button onClick={() => fileInputRef.current?.click()} className="w-full flex flex-col items-center justify-center p-8 border-2 border-dashed border-accent rounded-lg hover:bg-accent/50 transition-colors">
                     {ICONS.upload}
-                    <span className="mt-2 text-sm">Click to upload Skin Image</span>
+                    <span className="mt-2 text-sm text-text-primary">Click to upload Skin Image</span>
                 </button>
             )}
 
@@ -188,11 +188,11 @@ const SkinLesionAnalyzer: React.FC = () => {
                 </div>
             )}
              <div className="flex gap-2">
-                <button onClick={handleAnalysis} disabled={!imageFile || isLoading} className="w-full mt-4 bg-highlight text-white font-bold py-3 rounded-lg hover:bg-blue-500 disabled:bg-gray-500 transition-colors">
+                <button onClick={handleAnalysis} disabled={!imageFile || isLoading} className="w-full mt-4 bg-highlight text-white font-bold py-3 rounded-lg hover:opacity-90 disabled:bg-gray-500 transition-colors">
                     {isLoading ? 'Analyzing...' : 'Analyze Image'}
                 </button>
                  {imageFile && 
-                    <button onClick={() => {setImageFile(null); setImagePreview(null); setResult(null);}} disabled={isLoading} className="w-1/3 mt-4 bg-danger text-white font-bold py-3 rounded-lg hover:bg-red-500 disabled:bg-gray-500 transition-colors">
+                    <button onClick={() => {setImageFile(null); setImagePreview(null); setResult(null);}} disabled={isLoading} className="w-1/3 mt-4 bg-danger text-white font-bold py-3 rounded-lg hover:opacity-90 disabled:bg-gray-500 transition-colors">
                         Clear
                     </button>
                 }
@@ -202,14 +202,14 @@ const SkinLesionAnalyzer: React.FC = () => {
 
             {result && (
                 <div className="mt-6">
-                    <h3 className="text-xl font-bold mb-2">Analysis Results</h3>
+                    <h3 className="text-xl font-bold mb-2 text-text-primary">Analysis Results</h3>
                     <div className="bg-accent p-4 rounded-lg text-center">
-                        <p className="text-lg">Prediction:</p>
+                        <p className="text-lg text-light">Prediction:</p>
                         <p className="text-3xl font-bold text-highlight">{result.prediction}</p>
-                        <p className="text-sm text-light/70">Confidence: {(result.confidence * 100).toFixed(1)}%</p>
+                        <p className="text-sm text-light">Confidence: {(result.confidence * 100).toFixed(1)}%</p>
                     </div>
                      <div className="mt-4 bg-accent p-4 rounded-md">
-                        <p className="text-light/90 whitespace-pre-wrap">{result.explanation}</p>
+                        <p className="text-text-primary whitespace-pre-wrap">{result.explanation}</p>
                     </div>
                 </div>
             )}

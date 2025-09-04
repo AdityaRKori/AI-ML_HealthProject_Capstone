@@ -6,19 +6,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The Oracle</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        --color-primary: #121212; /* Light Black */
+        --color-secondary: #1E1E1E;
+        --color-accent: #2C2C2C;
+        --color-light: #BDBDBD;
+        --color-text: #E0E1DD;
+        --color-highlight: #8B5CF6; /* Violet */
+        --color-highlight-text: #FFFFFF;
+        --color-primary-action: #EF4444; /* Red */
+        --color-primary-action-text: #FFFFFF;
+        --color-success: #10B981;
+        --color-warning: #F59E0B;
+        --color-danger: #EF4444;
+      }
+
+      .light {
+        --color-primary: #FFFFFF;
+        --color-secondary: #F0F2F5;
+        --color-accent: #E4E6EB;
+        --color-light: #4B5563;
+        --color-text: #111827;
+        --color-highlight: #3B82F6; /* Blue */
+        --color-highlight-text: #FFFFFF;
+        --color-primary-action: #10B981; /* Green */
+        --color-primary-action-text: #FFFFFF;
+        --color-success: #10B981;
+        --color-warning: #F59E0B;
+        --color-danger: #EF4444;
+      }
+
+      /* Scrollbar styles */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--color-secondary);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--color-accent);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-highlight);
+      }
+    </style>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              'primary': '#0D1B2A',
-              'secondary': '#1B263B',
-              'accent': '#415A77',
-              'light': '#E0E1DD',
-              'highlight': '#3B82F6',
-              'success': '#10B981',
-              'warning': '#F59E0B',
-              'danger': '#EF4444',
+              primary: 'var(--color-primary)',
+              secondary: 'var(--color-secondary)',
+              accent: 'var(--color-accent)',
+              light: 'var(--color-light)',
+              'text-primary': 'var(--color-text)',
+              highlight: 'var(--color-highlight)',
+              'highlight-text': 'var(--color-highlight-text)',
+              'primary-action': 'var(--color-primary-action)',
+              'primary-action-text': 'var(--color-primary-action-text)',
+              success: 'var(--color-success)',
+              warning: 'var(--color-warning)',
+              danger: 'var(--color-danger)',
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-in-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: 0 },
+                '100%': { opacity: 1 },
+              },
             },
           }
         }
@@ -37,7 +97,7 @@
 }
 </script>
 </head>
-  <body class="bg-primary text-light">
+  <body class="bg-primary text-text-primary transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

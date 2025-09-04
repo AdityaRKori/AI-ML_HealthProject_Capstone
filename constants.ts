@@ -1,5 +1,6 @@
 
 import React from 'react';
+import type { GeneticMarker } from './types';
 
 export const COUNTRIES = [
     { code: 'IN', name: 'India', cities: ['Bangalore', 'Delhi', 'Mumbai', 'Chennai'] },
@@ -22,7 +23,29 @@ export const POPULATION_AVERAGES = {
     bmi: 26.5
 };
 
-// FIX: Replaced JSX with React.createElement to be compatible with .ts files.
+export const GENETIC_MARKERS_DATA: Omit<GeneticMarker, 'userHas'>[] = [
+    {
+        id: 'cyp2c19',
+        name: 'CYP2C19 Gene Variant',
+        description: 'Affects metabolism of certain drugs, including some blood thinners (like Plavix) and antidepressants. Having a variant may require dose adjustments.'
+    },
+    {
+        id: 'brca1',
+        name: 'BRCA1 Gene Mutation',
+        description: 'Significantly increases the risk of developing breast and ovarian cancer. Early screening and preventative measures are often recommended for carriers.'
+    },
+    {
+        id: 'mthfr',
+        name: 'MTHFR Gene Variant',
+        description: 'Impacts how the body processes folate (vitamin B9). Certain variants can be linked to elevated homocysteine levels, a risk factor for heart disease.'
+    },
+    {
+        id: 'fvl',
+        name: 'Factor V Leiden',
+        description: 'A common genetic mutation that increases the risk of developing abnormal blood clots (thrombophilia), particularly in the legs or lungs.'
+    }
+];
+
 // In a typical setup, this file would be renamed to constants.tsx to allow JSX syntax.
 export const ICONS: { [key: string]: React.ReactElement } = {
     logo: React.createElement("svg", { viewBox: "0 0 64 64", fill: "none", xmlns: "http://www.w3.org/2000/svg" }, 
@@ -44,6 +67,11 @@ export const ICONS: { [key: string]: React.ReactElement } = {
     imageAnalysis: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 10L3 3" })),
     warning: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" })),
     chevronDown: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement("path", { fillRule: "evenodd", d: "M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z", clipRule: "evenodd" })),
+    sun: React.createElement("svg", { xmlns:"http://www.w3.org/2000/svg", className:"h-6 w-6", fill:"none", viewBox:"0 0 24 24", stroke:"currentColor" }, React.createElement("path", { strokeLinecap:"round", strokeLinejoin:"round", strokeWidth:2, d:"M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" })),
+    moon: React.createElement("svg", { xmlns:"http://www.w3.org/2000/svg", className:"h-6 w-6", fill:"none", viewBox:"0 0 24 24", stroke:"currentColor" }, React.createElement("path", { strokeLinecap:"round", strokeLinejoin:"round", strokeWidth:2, d:"M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" })),
+    report: React.createElement("svg", { xmlns:"http://www.w3.org/2000/svg", className:"h-6 w-6", fill:"none", viewBox:"0 0 24 24", stroke:"currentColor" }, React.createElement("path", { strokeLinecap:"round", strokeLinejoin:"round", strokeWidth:2, d:"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" })),
+    world: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-8 w-8", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h8a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.707 4.293l.707-.707a2 2 0 012.828 0l.707.707M15.293 4.293l.707.707a2 2 0 002.828 0l.707-.707M4 11a9 9 0 1016 0H4z" })),
+    flag: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-8 w-8", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" })),
 };
 
 export const DISEASE_INFO = {

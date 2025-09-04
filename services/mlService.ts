@@ -21,7 +21,6 @@ function predictDiabetes(vitals: Vitals, profile: UserProfile, bmi: number): Ris
     let score = 0;
     const factors: string[] = [];
 
-    // Glucose levels (per American Diabetes Association)
     if (vitals.bloodGlucose > 125) {
         score += 0.5;
         factors.push("High fasting blood glucose level.");
@@ -30,7 +29,6 @@ function predictDiabetes(vitals: Vitals, profile: UserProfile, bmi: number): Ris
         factors.push("Elevated fasting blood glucose (pre-diabetic range).");
     }
 
-    // BMI
     if (bmi > 30) {
         score += 0.3;
         factors.push("Obesity (BMI > 30).");
@@ -39,7 +37,6 @@ function predictDiabetes(vitals: Vitals, profile: UserProfile, bmi: number): Ris
         factors.push("Overweight (BMI > 25).");
     }
 
-    // Age
     if (profile.age > 45) {
         score += 0.15;
         factors.push("Age over 45.");
@@ -57,7 +54,6 @@ function predictCardioDisease(vitals: Vitals, profile: UserProfile, bmi: number)
     let score = 0;
     const factors: string[] = [];
 
-    // Cholesterol
     if (vitals.cholesterol > 240) {
         score += 0.4;
         factors.push("High total cholesterol.");
@@ -66,13 +62,11 @@ function predictCardioDisease(vitals: Vitals, profile: UserProfile, bmi: number)
         factors.push("Borderline high cholesterol.");
     }
     
-    // Blood Pressure
     if (vitals.systolicBP > 140 || vitals.diastolicBP > 90) {
         score += 0.3;
         factors.push("High blood pressure.");
     }
 
-    // BMI & Age
     if (bmi > 30) score += 0.15;
     if (profile.age > 50) score += 0.15;
     if (bmi > 30 || profile.age > 50) factors.push("BMI and/or age are contributing factors.");
@@ -127,16 +121,13 @@ function getRiskLevel(score: number): 'Low' | 'Medium' | 'High' | 'Very High' {
 // --- Image Analysis Simulations ---
 
 export async function analyzeChestXRay(image: File): Promise<Omit<ChestXRayAnalysis, 'explanation'>> {
-    // Simulate network delay
     await new Promise(res => setTimeout(res, 1500));
 
-    // Simulate a CNN model's output probabilities
-    const categories: ChestXRayAnalysis['predictions'][0]['name'][] = ['Normal', 'Bacterial Pneumonia', 'Tuberculosis', 'COVID-19'];
+    const categories: ChestXRayAnalysis['predictions'][0]['name'][] = ['Normal', 'Bacterial Pneumonia', 'Viral Pneumonia', 'Tuberculosis', 'COVID-19', 'Lung Opacity'];
     let probabilities = categories.map(() => Math.random());
     const sum = probabilities.reduce((a, b) => a + b, 0);
-    probabilities = probabilities.map(p => p / sum); // Normalize to sum to 1
+    probabilities = probabilities.map(p => p / sum);
 
-    // Create a plausible but random result
     const predictions = categories.map((name, index) => ({
         name,
         probability: probabilities[index],
@@ -146,13 +137,11 @@ export async function analyzeChestXRay(image: File): Promise<Omit<ChestXRayAnaly
 }
 
 export async function analyzeSkinLesion(image: File): Promise<Omit<SkinLesionAnalysis, 'explanation'>> {
-     // Simulate network delay
     await new Promise(res => setTimeout(res, 1500));
     
-    // Simulate model output
-    const categories: SkinLesionAnalysis['prediction'][] = ['Acne', 'Mosquito Bite', 'Eczema', 'Normal Skin'];
+    const categories: SkinLesionAnalysis['prediction'][] = ['Benign Keratosis', 'Melanoma', 'Basal Cell Carcinoma', 'Acne', 'Eczema', 'Normal Skin'];
     const prediction = categories[Math.floor(Math.random() * categories.length)];
-    const confidence = Math.random() * (0.98 - 0.75) + 0.75; // Confidence between 75% and 98%
+    const confidence = Math.random() * (0.98 - 0.75) + 0.75;
 
     return { prediction, confidence };
 }
