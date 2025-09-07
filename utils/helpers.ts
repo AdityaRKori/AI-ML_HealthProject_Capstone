@@ -94,6 +94,40 @@ export function getBase64(file: File): Promise<{ data: string; mimeType: string;
     });
 }
 
+// Simulates processing various medical image file formats
+export async function processMedicalImageFile(file: File): Promise<{ data: string; mimeType: string; previewUrl: string }> {
+    const fileType = file.type;
+    const extension = file.name.split('.').pop()?.toLowerCase();
+
+    if (['image/jpeg', 'image/png'].includes(fileType)) {
+        const result = await getBase64(file);
+        return { ...result, previewUrl: URL.createObjectURL(file) };
+    }
+
+    // Simulate processing for PDF and DICOM
+    if (fileType === 'application/pdf' || extension === 'dcm') {
+        const isDicom = extension === 'dcm';
+        // Create a placeholder SVG to represent the processed file
+        const svgContent = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150">
+                <rect width="100%" height="100%" fill="#2C2C2C" />
+                <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="20" fill="#E0E1DD">${isDicom ? 'DICOM' : 'PDF'}</text>
+                <text x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#BDBDBD">Image Processed</text>
+            </svg>
+        `;
+        const base64Svg = btoa(svgContent);
+        const dataUrl = `data:image/svg+xml;base64,${base64Svg}`;
+        
+        return {
+            data: base64Svg,
+            mimeType: 'image/svg+xml',
+            previewUrl: dataUrl,
+        };
+    }
+
+    throw new Error('Unsupported file format');
+}
+
 
 export function estimateCityPopulation(countryPopulation: number): number {
     if (!countryPopulation) return 0;

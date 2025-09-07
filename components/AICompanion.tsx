@@ -1,11 +1,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { getChatCompletion, getImageAnalysis, getSummaryFromChat } from '../services/apiService';
+import { getChatCompletion, getSummaryFromChat } from '../services/apiService';
 import { ICONS } from '../constants';
 import { getBase64, getCoachSettings, saveCoachSettings } from '../utils/helpers';
 import type { CoachSettings, UserProfile } from '../types';
 
 type Message = {
+    id: string;
     sender: 'user' | 'bot';
     text: string;
     imageUrl?: string;
@@ -18,7 +19,7 @@ interface AICompanionProps {
 
 const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate }) => {
     const [messages, setMessages] = useState<Message[]>([
-        { sender: 'bot', text: "Hello! I'm your AI Health Companion. If you mention any specific health concerns, I can help you add them to your profile to personalize future analyses." }
+        { id: 'initial-message', sender: 'bot', text: "Hello! I'm your AI Health Companion. If you mention any specific health concerns, I can help you add them to your profile to personalize future analyses." }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -33,9 +34,20 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
     });
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [tempSettings, setTempSettings] = useState<CoachSettings>(coachSettings);
+    
+    // Voice I/O State
+    const [isRecording, setIsRecording] = useState(false);
+    const [speechLang, setSpeechLang] = useState('en-US');
+    const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+    const recognitionRef = useRef<any>(null); // SpeechRecognition instance
+    const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    
+    const isSpeechSupported = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+    const isTtsSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -49,6 +61,68 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
         }
     }, []);
 
+    // Speech Recognition Setup
+    useEffect(() => {
+        if (!isSpeechSupported) return;
+        // FIX: Cast window to 'any' to access vendor-prefixed SpeechRecognition APIs without TypeScript errors.
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
+        
+        recognitionRef.current.onresult = (event: any) => {
+            const transcript = event.results[0][0].transcript;
+            setInput(transcript);
+        };
+        recognitionRef.current.onend = () => {
+            setIsRecording(false);
+        };
+        recognitionRef.current.onerror = (event: any) => {
+            console.error('Speech recognition error:', event.error);
+            setIsRecording(false);
+        };
+    }, [isSpeechSupported]);
+    
+    const toggleRecording = () => {
+        if (!isSpeechSupported || !recognitionRef.current) return;
+        if (isRecording) {
+            recognitionRef.current.stop();
+        } else {
+            recognitionRef.current.lang = speechLang;
+            recognitionRef.current.start();
+            setIsRecording(true);
+        }
+    };
+    
+    const handleSpeak = (message: Message) => {
+        if (!isTtsSupported) return;
+        
+        if (speakingMessageId === message.id) {
+            window.speechSynthesis.cancel();
+            setSpeakingMessageId(null);
+            return;
+        }
+
+        window.speechSynthesis.cancel(); // Stop any previous speech
+        const utterance = new SpeechSynthesisUtterance(message.text);
+        utteranceRef.current = utterance;
+
+        // Find the specific "American man" voice
+        const voices = window.speechSynthesis.getVoices();
+        const googleUsMale = voices.find(v => v.name === 'Google US English' && v.lang === 'en-US');
+        const microsoftDavid = voices.find(v => v.name === 'Microsoft David - English (United States)' && v.lang === 'en-US');
+        
+        if (message.text.match(/[a-zA-Z]/)) { // Simple check if text is likely English
+             utterance.voice = googleUsMale || microsoftDavid || voices.find(v => v.lang === 'en-US') || null;
+        }
+       
+        utterance.onstart = () => setSpeakingMessageId(message.id);
+        utterance.onend = () => setSpeakingMessageId(null);
+        utterance.onerror = () => setSpeakingMessageId(null);
+        
+        window.speechSynthesis.speak(utterance);
+    };
+
     const handleSaveSettings = () => {
         setCoachSettings(tempSettings);
         saveCoachSettings(tempSettings);
@@ -60,7 +134,7 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
         setChatSummary(null);
 
         const userMessageText = input || (mode === 'image' ? 'Analyze this image.' : '');
-        const userMessage: Message = { sender: 'user', text: userMessageText, imageUrl: imagePreview || undefined };
+        const userMessage: Message = { id: Date.now().toString(), sender: 'user', text: userMessageText, imageUrl: imagePreview || undefined };
         
         setMessages(prev => [...prev, userMessage]);
         setInput('');
@@ -72,22 +146,21 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
             let botResponseText = '';
             if (mode === 'image' && imageFile) {
                 const { data: base64Image, mimeType } = await getBase64(imageFile);
-                botResponseText = await getImageAnalysis(userMessageText, base64Image, mimeType);
+                botResponseText = await getChatCompletion(userMessageText, messages.slice(-5).map(m=>({sender: m.sender, text: m.text})), coachSettings, { base64Image, mimeType });
             } else {
-                botResponseText = await getChatCompletion(userMessageText, messages.slice(-5), coachSettings);
+                botResponseText = await getChatCompletion(userMessageText, messages.slice(-5).map(m=>({sender: m.sender, text: m.text})), coachSettings);
             }
-            const botMessage: Message = { sender: 'bot', text: botResponseText };
+            const botMessage: Message = { id: (Date.now() + 1).toString(), sender: 'bot', text: botResponseText };
             setMessages(prev => [...prev, botMessage]);
 
-            // Memory feature: analyze chat for health notes
-            const summary = await getSummaryFromChat([...messages, userMessage, botMessage]);
+            const summary = await getSummaryFromChat([...messages, userMessage, botMessage].map(m=>({sender: m.sender, text: m.text})));
             if (summary && !userProfile.healthNotes?.includes(summary)) {
                 setChatSummary(summary);
             }
 
         } catch (error) {
             console.error('Error with AI service:', error);
-            const errorMessage: Message = { sender: 'bot', text: 'Sorry, I encountered an error. Please try again later.' };
+            const errorMessage: Message = { id: (Date.now() + 1).toString(), sender: 'bot', text: 'Sorry, I encountered an error. Please try again later.' };
             setMessages(prev => [...prev, errorMessage]);
         } finally {
             setIsLoading(false);
@@ -109,9 +182,9 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
             healthNotes: [...(userProfile.healthNotes || []), chatSummary]
         };
         onProfileUpdate(updatedProfile);
-        setChatSummary(null); // Hide prompt after saving
+        setChatSummary(null);
         
-        const confirmationMessage: Message = { sender: 'bot', text: `Got it. I've added a note about "${chatSummary}" to your profile for future reference.` };
+        const confirmationMessage: Message = { id: Date.now().toString(), sender: 'bot', text: `Got it. I've added a note about "${chatSummary}" to your profile for future reference.` };
         setMessages(prev => [...prev, confirmationMessage]);
     };
 
@@ -125,7 +198,7 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
     return (
         <div className="h-full flex flex-col bg-secondary rounded-lg shadow-lg relative">
             {isSettingsOpen && (
-                <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
                     <div className="bg-secondary rounded-lg shadow-xl p-6 w-full max-w-md border border-accent">
                         <h2 className="text-2xl font-bold mb-6 text-text-primary">Companion Settings</h2>
                         <div className="space-y-4">
@@ -172,9 +245,18 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
             </div>
 
             <div className="flex-1 p-4 overflow-y-auto space-y-4">
-                {messages.map((msg, index) => (
-                    <div key={index} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
-                        {msg.sender === 'bot' && <div className="w-8 h-8 rounded-full bg-highlight text-white flex items-center justify-center flex-shrink-0">{ICONS.bot}</div>}
+                {messages.map((msg) => (
+                    <div key={msg.id} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
+                        {msg.sender === 'bot' && (
+                            <div className="flex flex-col items-center gap-1">
+                                <div className="w-8 h-8 rounded-full bg-highlight text-white flex items-center justify-center flex-shrink-0">{ICONS.bot}</div>
+                                {isTtsSupported && (
+                                    <button onClick={() => handleSpeak(msg)} className="text-light hover:text-highlight" title="Read aloud">
+                                        {speakingMessageId === msg.id ? ICONS.stop : ICONS.speaker}
+                                    </button>
+                                )}
+                            </div>
+                        )}
                         <div className={`p-3 rounded-lg max-w-lg ${msg.sender === 'user' ? 'bg-highlight text-white' : 'bg-accent text-text-primary'}`}>
                             <p className="whitespace-pre-wrap">{msg.text}</p>
                             {msg.imageUrl && <img src={msg.imageUrl} alt="Uploaded for analysis" className="mt-2 rounded-lg max-w-xs" />}
@@ -216,6 +298,18 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
                     </div>
                 )}
                 <div className="flex items-center bg-accent rounded-lg p-2">
+                     {isSpeechSupported && mode === 'chat' && (
+                        <>
+                           <button onClick={toggleRecording} className={`p-2 rounded-full ${isRecording ? 'text-danger animate-pulse' : 'text-light hover:text-highlight'}`} title="Voice input">
+                               {isRecording ? ICONS.stop : ICONS.microphone}
+                           </button>
+                           <select value={speechLang} onChange={(e) => setSpeechLang(e.target.value)} className="bg-transparent text-light text-xs focus:outline-none">
+                               <option value="en-US">EN</option>
+                               <option value="hi-IN">HI</option>
+                               <option value="kn-IN">KN</option>
+                           </select>
+                        </>
+                    )}
                     <input 
                         type="text" 
                         value={input} 

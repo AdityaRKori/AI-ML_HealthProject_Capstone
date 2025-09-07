@@ -29,6 +29,7 @@ export interface Vitals {
 export interface HealthRecord {
     id: string;
     date: string;
+    timeOfDay: 'morning' | 'afternoon' | 'evening';
     vitals: Vitals;
     bmi: number;
     riskAnalysis: RiskAnalysis;
@@ -140,4 +141,19 @@ export interface RegionalTopicData {
     title: string;
     analysis: string;
     keyStats: { label: string; value: string }[];
+}
+
+export type ImageType = 'chest-x-ray' | 'skin-lesion';
+
+export interface BluetoothDeviceState {
+    name: string;
+    batteryLevel: number;
+    connectionStatus: 'connected' | 'connecting' | 'disconnected';
+}
+
+export interface AITrendAnalysis {
+    overallAssessment: string;
+    positiveTrends: string[];
+    areasForImprovement: string[];
+    dynamicRecommendations: string[];
 }

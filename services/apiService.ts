@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import type { Vitals, UserProfile, RiskPrediction, CommunityData, WorldPopulation, CoachSettings, TrendingDisease, GlobalDiseaseStat, RegionalHealthData, ThematicData, DiseaseFactSheet, RegionalTopicData, CommunityStats } from '../types';
+import type { Vitals, UserProfile, RiskPrediction, CommunityData, WorldPopulation, CoachSettings, TrendingDisease, GlobalDiseaseStat, RegionalHealthData, ThematicData, DiseaseFactSheet, RegionalTopicData, CommunityStats, ImageType, HealthRecord, AITrendAnalysis } from '../types';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -8,9 +8,10 @@ export async function getAIHealthAnalysis(vitals: Vitals, profile: UserProfile, 
     const allergiesInfo = profile.allergies?.join(', ') || 'Not provided.';
     const healthNotesInfo = profile.healthNotes?.join('; ') || 'None noted.';
     const bmi = (vitals.weight / ((vitals.height / 100) ** 2));
+    const currentMonth = new Date().toLocaleString('default', { month: 'long' });
 
     const prompt = `
-        As an expert AI health analyst trained on millions of health records and successful intervention plans, your task is to provide a detailed, evidence-based, and actionable health assessment.
+        As an expert AI health analyst trained on millions of health records and successful intervention plans, your task is to provide a detailed, evidence-based, and actionable health assessment using Google Search to ground your answers in real-world, location-specific context.
 
         **User Profile & Vitals:**
         - Age: ${profile.age}
@@ -23,25 +24,26 @@ export async function getAIHealthAnalysis(vitals: Vitals, profile: UserProfile, 
         - Blood Glucose: ${vitals.bloodGlucose} mg/dL
         - Cholesterol: ${vitals.cholesterol} mg/dL
         - BMI: ${bmi.toFixed(1)}
+        - Current Month: ${currentMonth}
 
         **ML Model Risk Predictions:**
         ${predictions.map(p => `- ${p.disease}: ${p.riskLevel} risk`).join('\n')}
 
         **Your Task:**
-        Generate a comprehensive report in three distinct, bolded sections as outlined below. Maintain an encouraging and clear tone.
+        Generate a comprehensive report in three distinct, bolded sections as outlined below. Maintain an encouraging and clear tone. **Crucially, for all recommendations in sections 2 and 3, you MUST wrap positive, actionable advice in [DO]...[/DO] tags and things to avoid or warnings in [AVOID]...[/AVOID] tags.**
 
         **1. Health Risk Analysis:**
-        First, provide a root cause analysis of the user's risks. Explain how their regional background might influence the interpretation of their results (e.g., "For populations in ${profile.country}, a BMI of ${bmi.toFixed(1)} can carry different implications..."). Connect their vitals, BMI, and any relevant health notes to the ML predictions, explaining *why* these factors contribute to the predicted risks in a clear, cause-and-effect manner.
+        First, provide a root cause analysis of the user's risks. Explain how their regional background might influence their results. For example, use your search capabilities to comment on how a diet popular in ${profile.country} might contribute to factors like cholesterol or weight. Connect their vitals, BMI, and any relevant health notes to the ML predictions, explaining *why* these factors contribute to the predicted risks.
 
-        **2. Personalized Dietary Plan (Based on successful case studies):**
-        Analyze the user's risk factors. Based on what has proven effective for individuals with a similar profile (location, age, BMI), create a **sample 3-day meal plan** (Breakfast, Lunch, Dinner). This plan MUST be:
-        - **Culturally Relevant:** Food suggestions must be common and accessible in ${profile.country}.
+        **2. Personalized Dietary Plan (Grounded in Local Context):**
+        Create a **sample 3-day meal plan** (Breakfast, Lunch, Dinner). This plan MUST be:
+        - **Culturally Relevant:** Use Google Search to suggest meal ideas using ingredients common and accessible in ${profile.country}. If a major local food (e.g., cheese in some European countries) is a health concern, address it directly (e.g., "[AVOID]While popular, consider reducing cheese consumption...[/AVOID]").
         - **Allergy-Aware:** The plan must NOT include any foods the user is allergic to (${allergiesInfo}).
-        - **Goal-Oriented:** Directly address risk factors (e.g., low-sodium options for hypertension, low-glycemic foods for diabetes risk).
-        - **Specific & Beginner-Friendly:** Provide concrete meal ideas, not just food groups.
+        - **Seasonally Smart:** Use Google Search to add brief warnings if any recommended foods (like specific vegetables) might have seasonal issues (e.g., "[AVOID]For cauliflower in ${currentMonth}, ensure thorough cleaning as it's a rainy season...[/AVOID]").
+        - **Goal-Oriented:** Directly address risk factors (e.g., "[DO]Incorporate low-sodium options like grilled fish and steamed vegetables to help manage hypertension.[/DO]").
 
-        **3. Recommended Exercise Regimen (Evidence-Based):**
-        Based on effective strategies for this demographic, recommend a specific, beginner-friendly **weekly exercise schedule**. Detail the type, duration, and frequency (e.g., "Monday: 30-min brisk walk; Wednesday: 20-min bodyweight circuit (squats, push-ups, planks); Friday: 30-min brisk walk"). The goal is to provide a clear, actionable starting point.
+        **3. Recommended Exercise Regimen:**
+        Recommend a specific, beginner-friendly **weekly exercise schedule**. Detail the type, duration, and frequency using the required tags. Example: "[DO]Monday: 30-minute brisk walk in the morning.[/DO]".
     `;
 
     try {
@@ -52,6 +54,7 @@ export async function getAIHealthAnalysis(vitals: Vitals, profile: UserProfile, 
                 temperature: 0.5,
                 maxOutputTokens: 1200, 
                 thinkingConfig: { thinkingBudget: 400 },
+                tools: [{googleSearch: {}}],
             }
         });
         return response.text;
@@ -60,6 +63,78 @@ export async function getAIHealthAnalysis(vitals: Vitals, profile: UserProfile, 
         throw new Error('Failed to fetch AI analysis');
     }
 }
+
+export async function getAITrendAnalysis(healthHistory: HealthRecord[]): Promise<AITrendAnalysis> {
+    const simplifiedHistory = healthHistory.map(r => ({
+        date: r.date,
+        time: r.timeOfDay,
+        bp: `${r.vitals.systolicBP}/${r.vitals.diastolicBP}`,
+        glucose: r.vitals.bloodGlucose,
+        bmi: r.bmi.toFixed(1)
+    }));
+
+    const prompt = `
+        You are an AI health data analyst. Analyze the following time-series data from a user's health records. Your task is to identify key trends, provide an overall assessment, and generate dynamic recommendations.
+
+        Health Data:
+        ${JSON.stringify(simplifiedHistory, null, 2)}
+
+        **Your Task:**
+        Respond with a JSON object that strictly adheres to the provided schema.
+        1.  **overallAssessment:** A brief, encouraging summary of the user's progress (1-2 sentences).
+        2.  **positiveTrends:** An array of strings. Identify and describe any clear improvements (e.g., "Excellent work on lowering your average Systolic BP this period."). If none, return an empty array.
+        3.  **areasForImprovement:** An array of strings. Identify any negative trends or consistently high values and explain their potential implications (e.g., "Your morning blood glucose levels remain elevated, which could increase long-term risk."). If none, return an empty array.
+        4.  **dynamicRecommendations:** An array of strings. Provide 2-3 new, actionable recommendations based *directly* on the observed trends. For example, if morning glucose is high, suggest a specific breakfast change. If BP is improving, suggest maintaining the current exercise plan.
+    `;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        overallAssessment: { type: Type.STRING },
+                        positiveTrends: { type: Type.ARRAY, items: { type: Type.STRING } },
+                        areasForImprovement: { type: Type.ARRAY, items: { type: Type.STRING } },
+                        dynamicRecommendations: { type: Type.ARRAY, items: { type: Type.STRING } }
+                    },
+                    required: ["overallAssessment", "positiveTrends", "areasForImprovement", "dynamicRecommendations"]
+                }
+            }
+        });
+        return JSON.parse(response.text.trim());
+    } catch (error) {
+        console.error("Failed to fetch AI trend analysis:", error);
+        throw new Error("Failed to analyze health trends.");
+    }
+}
+
+
+export async function validateImageType(base64Image: string, mimeType: string, expectedType: ImageType): Promise<boolean> {
+    const prompt = `Analyze the content of this image. Classify it as one of the following categories: "Chest X-Ray", "Skin Lesion", "Animal", "Object", "Text Document", "Other". Respond with only the single most appropriate category name from this list.`;
+    const imagePart = { inlineData: { mimeType, data: base64Image } };
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: { parts: [{ text: prompt }, imagePart] },
+            config: { temperature: 0.0, maxOutputTokens: 10 }
+        });
+        
+        const classification = response.text?.trim().toLowerCase() ?? '';
+        const expectedClassification = expectedType.replace('-', ' ').toLowerCase();
+        
+        // Check if the model's classification includes what we expect.
+        // This is more robust against responses like "This is a Chest X-Ray."
+        return classification.includes(expectedClassification);
+    } catch (error) {
+        console.error("Failed to validate image type:", error);
+        return false; // Fail safely
+    }
+}
+
 
 export async function getSummaryFromChat(chatHistory: { sender: 'user' | 'bot'; text: string }[]): Promise<string | null> {
     const userMessages = chatHistory.filter(m => m.sender === 'user').map(m => m.text).join('\n');
@@ -95,16 +170,27 @@ export async function getSummaryFromChat(chatHistory: { sender: 'user' | 'bot'; 
     }
 }
 
+// FIX: Modified function to accept an optional image payload for multimodal chat.
+// This allows the AI Companion to handle image-based queries correctly without misusing the specialized getImageAnalysis function.
 export async function getChatCompletion(
     message: string,
     history: { sender: 'user' | 'bot'; text: string }[],
-    settings: CoachSettings
+    settings: CoachSettings,
+    image?: { base64Image: string, mimeType: string }
 ): Promise<string> {
-    const contents = history.map(m => ({
+    // FIX: Explicitly type `contents` to allow for multimodal parts (text and image). This prevents
+    // TypeScript from inferring a narrow type from `history.map` that only allows text parts,
+    // which would cause an error when adding the user's potentially image-containing message.
+    const contents: { role: string; parts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] }[] = history.map(m => ({
         role: m.sender === 'user' ? 'user' : 'model',
         parts: [{ text: m.text }]
     }));
-    contents.push({ role: 'user', parts: [{ text: message }] });
+
+    const userParts: ({ text: string } | { inlineData: { mimeType: string, data: string } })[] = [{ text: message }];
+    if (image) {
+        userParts.push({ inlineData: { mimeType: image.mimeType, data: image.base64Image } });
+    }
+    contents.push({ role: 'user', parts: userParts });
 
     const personalityInstructions = {
         'Empathetic & Encouraging': 'Your tone should be encouraging and supportive.',
@@ -112,7 +198,8 @@ export async function getChatCompletion(
         'Calm & Reassuring': 'Your goal is to provide information in a soothing, non-alarming, and reassuring way.',
         'Energetic & Motivational': 'You should use positive and energetic language to inspire and motivate the user.'
     };
-    const systemInstruction = `You are a helpful and versatile AI Health Companion named ${settings.name}. ${personalityInstructions[settings.personality]} You are an AI Health Companion, not a doctor. Always advise users to consult a healthcare professional for medical advice or diagnosis. You can provide safe, general health information.`;
+    // FIX: Updated system instruction to guide the model on how to handle images safely in a general chat context.
+    const systemInstruction = `You are a helpful and versatile AI Health Companion named ${settings.name}. ${personalityInstructions[settings.personality]} You are an AI Health Companion, not a doctor. Always advise users to consult a healthcare professional for medical advice or diagnosis. You can provide safe, general health information. If an image is provided, describe it or answer questions about it, but do not provide any medical diagnosis based on the image. For any medical-related images, reiterate the importance of consulting a professional.`;
 
     try {
         const response = await ai.models.generateContent({
@@ -132,15 +219,32 @@ export async function getChatCompletion(
     }
 }
 
-export async function getImageAnalysis(prompt: string, base64Image: string, mimeType: string): Promise<string> {
-    const textPart = { text: `Analyze this medical image with the following context: "${prompt}". IMPORTANT: You are an AI assistant providing preliminary observations. You are NOT a medical professional. Start your response with a clear disclaimer: "Disclaimer: This is an AI-powered analysis and not a medical diagnosis. Please consult a qualified healthcare professional." Then, explain the visual indicators that might lead to a classification and provide general, safe advice or information related to the potential finding.` };
+export async function getImageAnalysis(prompt: string, base64Image: string, mimeType: string, imageType: ImageType): Promise<string> {
+    const analysisType = imageType === 'chest-x-ray' ? 'chest x-ray' : 'skin lesion';
+    
+    const fullPrompt = `
+        You are an expert AI medical imaging assistant. Your task is to analyze the provided image and provide a detailed, evidence-based report based on the preliminary ML model findings. Your analysis MUST adhere to WHO guidelines and standards.
+
+        **Context:**
+        - Image Type: ${analysisType}
+        - Preliminary ML Finding: ${prompt}
+
+        **Your Task:**
+        1.  **Disclaimer:** Start with a clear, bolded disclaimer: "**Disclaimer: This is an AI-powered analysis and not a medical diagnosis. Please consult a qualified healthcare professional.**"
+        2.  **Visual Indicator Analysis:** Based on the preliminary finding, explain *what visual evidence in the image* could lead to such a conclusion. Be specific. For example:
+            - For Tuberculosis: "I am observing a potential cavitation (a hollow, shadowed space) in the upper-left lobe of the lung field, which is a common indicator for Tuberculosis."
+            - For Melanoma: "The lesion shows some asymmetry and has irregular borders, which are characteristics often evaluated when assessing for Melanoma."
+        3.  **Cause & Prevention (WHO-based):** Briefly explain the common causes of the potential condition and provide 2-3 key, actionable prevention tips based on WHO guidelines.
+        4.  **Next Steps:** Provide clear, safe, and responsible next steps. This should always include consulting a doctor. For example: "The recommended next step is to share this image and preliminary report with a radiologist or your primary care physician for a definitive diagnosis and treatment plan."
+    `;
+
     const imagePart = { inlineData: { mimeType, data: base64Image } };
 
     try {
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            contents: { parts: [textPart, imagePart] },
-            config: { maxOutputTokens: 500, thinkingConfig: { thinkingBudget: 100 } }
+            contents: { parts: [{ text: fullPrompt }, imagePart] },
+            config: { maxOutputTokens: 800, thinkingConfig: { thinkingBudget: 100 } }
         });
         return response.text;
     } catch (error) {

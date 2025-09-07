@@ -12,7 +12,7 @@ export function predictHealthRisks(vitals: Vitals, profile: UserProfile): RiskPr
 
     predictions.push(predictDiabetes(vitals, profile, bmi));
     predictions.push(predictCardioDisease(vitals, profile, bmi));
-    predictions.push(predictHypertension(vitals, profile));
+    predictions.push(predictHypertension(vitals, profile, bmi));
 
     return predictions;
 }
@@ -35,6 +35,11 @@ function predictDiabetes(vitals: Vitals, profile: UserProfile, bmi: number): Ris
     } else if (bmi > 25) {
         score += 0.15;
         factors.push("Overweight (BMI > 25).");
+    }
+    
+    if (vitals.weight > 300) {
+        score += 0.2; // Add significant risk for morbid obesity
+        factors.push("Extremely high body weight is a critical risk factor.");
     }
 
     if (profile.age > 45) {
@@ -79,7 +84,7 @@ function predictCardioDisease(vitals: Vitals, profile: UserProfile, bmi: number)
     };
 }
 
-function predictHypertension(vitals: Vitals, profile: UserProfile): RiskPrediction {
+function predictHypertension(vitals: Vitals, profile: UserProfile, bmi: number): RiskPrediction {
     let score = 0;
     const factors: string[] = [];
     
@@ -101,6 +106,11 @@ function predictHypertension(vitals: Vitals, profile: UserProfile): RiskPredicti
 
     if (profile.age > 60) score = Math.min(score + 0.1, 1);
     if(score > 0.1 && profile.age > 60) factors.push("Age is a contributing factor.");
+    
+    if (bmi > 30) {
+        score = Math.min(score + 0.15, 1);
+        factors.push("Obesity is a major contributing factor.");
+    }
 
 
     return {

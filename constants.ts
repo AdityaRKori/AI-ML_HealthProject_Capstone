@@ -1,18 +1,17 @@
-
 import React from 'react';
 import type { GeneticMarker } from './types';
 
 export const COUNTRIES = [
-    { code: 'IN', name: 'India', cities: ['Bangalore', 'Delhi', 'Mumbai', 'Chennai'] },
-    { code: 'US', name: 'United States', cities: ['New York', 'Los Angeles', 'Chicago'] },
-    { code: 'CN', name: 'China', cities: ['Beijing', 'Shanghai', 'Shenzhen'] },
-    { code: 'ID', name: 'Indonesia', cities: ['Jakarta', 'Surabaya'] },
-    { code: 'PK', name: 'Pakistan', cities: ['Karachi', 'Lahore'] },
-    { code: 'BR', name: 'Brazil', cities: ['São Paulo', 'Rio de Janeiro'] },
-    { code: 'NG', name: 'Nigeria', cities: ['Lagos', 'Kano'] },
-    { code: 'BD', name: 'Bangladesh', cities: ['Dhaka', 'Chittagong'] },
-    { code: 'RU', name: 'Russia', cities: ['Moscow', 'Saint Petersburg'] },
-    { code: 'MX', name: 'Mexico', cities: ['Mexico City', 'Guadalajara'] },
+    { code: 'IN', name: 'India', cities: ['Bangalore', 'Delhi', 'Mumbai', 'Chennai'], emergencyNumber: '112' },
+    { code: 'US', name: 'United States', cities: ['New York', 'Los Angeles', 'Chicago'], emergencyNumber: '911' },
+    { code: 'CN', name: 'China', cities: ['Beijing', 'Shanghai', 'Shenzhen'], emergencyNumber: '120' },
+    { code: 'ID', name: 'Indonesia', cities: ['Jakarta', 'Surabaya'], emergencyNumber: '112' },
+    { code: 'PK', name: 'Pakistan', cities: ['Karachi', 'Lahore'], emergencyNumber: '1122' },
+    { code: 'BR', name: 'Brazil', cities: ['São Paulo', 'Rio de Janeiro'], emergencyNumber: '192' },
+    { code: 'NG', name: 'Nigeria', cities: ['Lagos', 'Kano'], emergencyNumber: '112' },
+    { code: 'BD', name: 'Bangladesh', cities: ['Dhaka', 'Chittagong'], emergencyNumber: '999' },
+    { code: 'RU', name: 'Russia', cities: ['Moscow', 'Saint Petersburg'], emergencyNumber: '112' },
+    { code: 'MX', name: 'Mexico', cities: ['Mexico City', 'Guadalajara'], emergencyNumber: '911' },
 ];
 
 export const POPULATION_AVERAGES = {
@@ -23,11 +22,35 @@ export const POPULATION_AVERAGES = {
     bmi: 26.5
 };
 
+export const BLOOD_PRESSURE_CATEGORIES = [
+    { name: 'Low', max: 89, color: 'bg-blue-500' },
+    { name: 'Normal', max: 119, color: 'bg-success' },
+    { name: 'Elevated', max: 129, color: 'bg-yellow-500' },
+    { name: 'High (S1)', max: 139, color: 'bg-orange-500' },
+    { name: 'High (S2)', max: 179, color: 'bg-danger' },
+    { name: 'Hypertensive Crisis', max: Infinity, color: 'bg-red-800' },
+];
+
+export const VITAL_RANGES = {
+    systolicBP: { normal: 120, borderline: 130, high: 140 },
+    diastolicBP: { normal: 80, borderline: 85, high: 90 },
+    bloodGlucose: { normal: 100, borderline: 125, high: 126 },
+    cholesterol: { normal: 200, borderline: 239, high: 240 },
+};
+
+export const VITAL_CHART_RANGES = {
+    systolicBP: { min: 90, max: 120 },
+    diastolicBP: { min: 60, max: 80 },
+    bloodGlucose: { min: 70, max: 100 },
+    cholesterol: { min: 125, max: 200 },
+    bmi: { min: 18.5, max: 24.9 },
+};
+
 export const GENETIC_MARKERS_DATA: Omit<GeneticMarker, 'userHas'>[] = [
     {
         id: 'cyp2c19',
         name: 'CYP2C19 Gene Variant',
-        description: 'Affects metabolism of certain drugs, including some blood thinners (like Plavix) and antidepressants. Having a variant may require dose adjustments.'
+        description: 'Affects metabolism of certain drugs, including some blood thinners (like Plix) and antidepressants. Having a variant may require dose adjustments.'
     },
     {
         id: 'brca1',
@@ -72,6 +95,9 @@ export const ICONS: { [key: string]: React.ReactElement } = {
     report: React.createElement("svg", { xmlns:"http://www.w3.org/2000/svg", className:"h-6 w-6", fill:"none", viewBox:"0 0 24 24", stroke:"currentColor" }, React.createElement("path", { strokeLinecap:"round", strokeLinejoin:"round", strokeWidth:2, d:"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" })),
     world: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-8 w-8", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h8a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.707 4.293l.707-.707a2 2 0 012.828 0l.707.707M15.293 4.293l.707.707a2 2 0 002.828 0l.707-.707M4 11a9 9 0 1016 0H4z" })),
     flag: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-8 w-8", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" })),
+    microphone: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement("path", { fillRule: "evenodd", d: "M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm5 10.5a.5.5 0 01.5.5v.5a.5.5 0 01-1 0V15a.5.5 0 01.5-.5zM8 15a.5.5 0 00-1 0v.5a.5.5 0 001 0V15zM10 18a5 5 0 005-5h-1a4 4 0 01-8 0H5a5 5 0 005 5z", clipRule: "evenodd" })),
+    speaker: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement("path", { d: "M10 3.25a.75.75 0 01.75.75v12a.75.75 0 01-1.5 0V4A.75.75 0 0110 3.25zM4.75 5.5a.75.75 0 000 1.5h.5a.75.75 0 000-1.5h-.5zM14.75 5.5a.75.75 0 000 1.5h.5a.75.75 0 000-1.5h-.5zM5.5 8a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5A.75.75 0 015.5 8zm9.5 0a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5a.75.75 0 01-.75-.75zM8 10.5a.75.75 0 000 1.5h.5a.75.75 0 000-1.5H8zm3.5 0a.75.75 0 000 1.5h.5a.75.75 0 000-1.5h-.5z" })),
+    stop: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z", clipRule: "evenodd" })),
 };
 
 export const DISEASE_INFO = {

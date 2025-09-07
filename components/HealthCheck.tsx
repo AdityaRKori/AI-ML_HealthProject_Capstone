@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from 'react';
-import type { UserProfile, Vitals, RiskAnalysis, HealthRecord } from '../types';
+import React, { useState, useMemo, useEffect } from 'react';
+import type { UserProfile, Vitals, RiskAnalysis, HealthRecord, BluetoothDeviceState } from '../types';
 import { predictHealthRisks } from '../services/mlService';
 import { getAIHealthAnalysis } from '../services/apiService';
 import { calculateBMI, getBMICategory, getIdealWeightRange } from '../utils/helpers';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip, Legend } from 'recharts';
-// Fix: Import the COUNTRIES constant.
-import { POPULATION_AVERAGES, COUNTRIES } from '../constants';
+import { POPULATION_AVERAGES, COUNTRIES, ICONS } from '../constants';
+import BluetoothManager from './BluetoothManager';
+import BloodPressureMeter from './BloodPressureMeter';
 
 interface HealthCheckProps {
     userProfile: UserProfile;
@@ -13,7 +14,39 @@ interface HealthCheckProps {
     onViewReport: (record: HealthRecord) => void;
 }
 
-// --- Helper Functions and Sub-Components (moved to top-level) ---
+// --- Sub-Components (moved to top-level) ---
+
+interface EmergencyModalProps {
+    onClose: () => void;
+    emergencyNumber: string;
+    message: string;
+    firstAid: React.ReactNode;
+}
+
+const EmergencyModal: React.FC<EmergencyModalProps> = ({ onClose, emergencyNumber, message, firstAid }) => (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div className="bg-secondary border-2 border-danger rounded-lg shadow-xl p-6 w-full max-w-lg text-center">
+            <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 text-danger">{ICONS.warning}</div>
+            </div>
+            <h2 className="text-3xl font-bold text-danger mb-4">Emergency Alert</h2>
+            <p className="text-text-primary text-lg mb-6">{message}</p>
+            
+            <div className="bg-accent p-4 rounded-lg text-left mb-6">
+                 <h3 className="font-bold text-highlight mb-2">Immediate First Aid:</h3>
+                 {firstAid}
+            </div>
+
+            <a href={`tel:${emergencyNumber}`} className="w-full block bg-danger text-white font-bold py-4 rounded-lg text-2xl hover:opacity-90 transition-opacity">
+                Call {emergencyNumber} Now
+            </a>
+            <button onClick={onClose} className="mt-4 text-sm text-light hover:underline">
+                I understand, close this alert.
+            </button>
+        </div>
+    </div>
+);
+
 
 const getRiskColor = (level: string) => {
     if (level === 'Low') return 'text-success';
@@ -131,12 +164,79 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
         height: 170,
         weight: 70,
     });
+    const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening'>('morning');
+    const [bpReading, setBpReading] = useState<{ systolic: number; diastolic: number} | null>(null);
+    const [warnings, setWarnings] = useState<Record<string, string>>({});
+    const [emergency, setEmergency] = useState<{ type: 'bp' | 'glucose'; message: string; firstAid: React.ReactNode } | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<HealthRecord | null>(null);
 
+    const countryData = useMemo(() => COUNTRIES.find(c => c.name === userProfile.country) || COUNTRIES[0], [userProfile.country]);
+
+    const validateVitals = (name: string, value: number) => {
+        const newWarnings = { ...warnings };
+        delete newWarnings[name];
+
+        // Emergency Checks
+        if ((name === 'systolicBP' && value > 180) || (name === 'diastolicBP' && value > 120)) {
+            setEmergency({
+                type: 'bp',
+                message: 'Your blood pressure is in a hypertensive crisis range. This is a medical emergency requiring immediate attention.',
+                firstAid: (
+                    <ul className="list-disc list-inside space-y-1 text-text-primary">
+                        <li><strong className="text-warning">Sit down and try to remain calm.</strong></li>
+                        <li>Do not drive yourself. Have someone else call for help.</li>
+                        <li>Follow instructions from emergency services.</li>
+                    </ul>
+                ),
+            });
+        } else if ((name === 'bloodGlucose' && value > 300) || (name === 'bloodGlucose' && value < 60)) {
+            setEmergency({
+                type: 'glucose',
+                message: value > 300 ? 'Your blood glucose is critically high (hyperglycemia).' : 'Your blood glucose is critically low (hypoglycemia).',
+                firstAid: value > 300 ? (
+                     <ul className="list-disc list-inside space-y-1 text-text-primary">
+                         <li><strong className="text-warning">Do not administer extra insulin unless advised by a doctor.</strong></li>
+                         <li>Drink water to help flush excess sugar, if conscious and able.</li>
+                     </ul>
+                ) : (
+                    <ul className="list-disc list-inside space-y-1 text-text-primary">
+                        <li><strong className="text-warning">Consume 15g of fast-acting carbs</strong> (e.g., half a cup of juice or soda, 3-4 glucose tablets).</li>
+                        <li>Re-check blood sugar in 15 minutes.</li>
+                    </ul>
+                ),
+            });
+        }
+
+        // Implausible Value Checks
+        else if (name === 'weight' && value > 500) {
+            newWarnings[name] = 'This weight is highly abnormal. If this is not a typo, please consult a medical professional immediately.';
+        }
+        setWarnings(newWarnings);
+    };
+
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setVitals(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+        const numericValue = parseFloat(value) || 0;
+        setVitals(prev => ({ ...prev, [name]: numericValue }));
+        if (name === 'systolicBP' || name === 'diastolicBP') {
+             setBpReading(prev => ({
+                systolic: name === 'systolicBP' ? numericValue : prev?.systolic ?? vitals.systolicBP,
+                diastolic: name === 'diastolicBP' ? numericValue : prev?.diastolic ?? vitals.diastolicBP,
+            }));
+        }
+        validateVitals(name, numericValue);
+    };
+
+    const handleBPReading = (systolic: number, diastolic: number) => {
+        setVitals(prev => ({
+            ...prev,
+            systolicBP: systolic,
+            diastolicBP: diastolic,
+        }));
+        setBpReading({ systolic, diastolic });
+        validateVitals('systolicBP', systolic);
     };
 
     const handleAnalysis = async () => {
@@ -157,6 +257,7 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
             const newRecord: HealthRecord = {
                 id: new Date().toISOString(),
                 date: new Date().toISOString(),
+                timeOfDay,
                 vitals,
                 bmi,
                 riskAnalysis,
@@ -180,6 +281,7 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
             const newRecord: HealthRecord = {
                 id: new Date().toISOString(),
                 date: new Date().toISOString(),
+                timeOfDay,
                 vitals,
                 bmi,
                 riskAnalysis,
@@ -203,30 +305,57 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
     
     return (
         <div className="space-y-8 animate-fade-in">
+             {emergency && (
+                <EmergencyModal 
+                    onClose={() => setEmergency(null)}
+                    emergencyNumber={countryData.emergencyNumber}
+                    message={emergency.message}
+                    firstAid={emergency.firstAid}
+                />
+            )}
             <h1 className="text-3xl font-bold text-text-primary">Health Check-up</h1>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Vitals Input */}
-                <div className="bg-secondary p-6 rounded-lg shadow-lg">
-                    <h2 className="text-2xl font-semibold mb-4 text-highlight">Enter Your Vitals</h2>
+                <div className="lg:col-span-2 bg-secondary p-6 rounded-lg shadow-lg">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-2xl font-semibold text-highlight">Enter Your Vitals</h2>
+                        <div className="flex items-center gap-1 bg-accent p-1 rounded-lg">
+                            {(['morning', 'afternoon', 'evening'] as const).map(time => (
+                                <button
+                                    key={time}
+                                    onClick={() => setTimeOfDay(time)}
+                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${timeOfDay === time ? 'bg-highlight text-white' : 'text-light hover:bg-primary'}`}
+                                >
+                                    {time.charAt(0).toUpperCase() + time.slice(1)}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                         {Object.entries(vitals).map(([key, value]) => (
                              <div key={key}>
                                 <label className="text-sm text-light capitalize">{key.replace(/([A-Z])/g, ' $1')}{key === 'height' ? ' (cm)' : key === 'weight' ? ' (kg)' : ''}</label>
                                 <input type="number" name={key} value={value} onChange={handleInputChange} className="w-full p-2 mt-1 bg-accent rounded-md text-text-primary border-transparent focus:ring-highlight focus:border-highlight" />
+                                {warnings[key] && <p className="text-xs text-warning mt-1">{warnings[key]}</p>}
                             </div>
                         ))}
                     </div>
+                    {bpReading && <BloodPressureMeter systolic={bpReading.systolic} diastolic={bpReading.diastolic} />}
                     <button onClick={handleAnalysis} disabled={isLoading} className="w-full mt-6 bg-primary-action text-primary-action-text font-bold py-3 rounded-lg hover:opacity-90 disabled:bg-gray-500 transition-colors">
                         {isLoading ? 'Analyzing...' : 'Analyze My Health'}
                     </button>
                 </div>
 
-                {/* Vitals Snapshot */}
-                <div className="bg-secondary p-6 rounded-lg shadow-lg">
-                    <h2 className="text-2xl font-semibold mb-4 text-highlight">Vitals Snapshot</h2>
-                     <p className="text-center text-light mb-4">Your key vitals compared to population averages.</p>
-                    <VitalsComparisonChart vitals={vitals} bmi={bmi} />
+                {/* Bluetooth & Snapshot */}
+                <div className="space-y-8">
+                    <BluetoothManager onReceiveReading={handleBPReading} />
+                    <div className="bg-secondary p-6 rounded-lg shadow-lg">
+                        <h2 className="text-2xl font-semibold mb-4 text-highlight">Vitals Snapshot</h2>
+                        <p className="text-center text-light mb-4 text-sm">Your key vitals compared to population averages.</p>
+                        <VitalsComparisonChart vitals={vitals} bmi={bmi} />
+                    </div>
                 </div>
             </div>
 
