@@ -4,7 +4,7 @@ import { predictHealthRisks } from '../services/mlService';
 import { getAIHealthAnalysis } from '../services/apiService';
 import { calculateBMI, getBMICategory, getIdealWeightRange } from '../utils/helpers';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip, Legend } from 'recharts';
-import { POPULATION_AVERAGES, COUNTRIES, ICONS } from '../constants';
+import { GLOBAL_POPULATION_AVERAGES, NATIONAL_POPULATION_AVERAGES, COUNTRIES, ICONS } from '../constants';
 import BluetoothManager from './BluetoothManager';
 import BloodPressureMeter from './BloodPressureMeter';
 
@@ -55,13 +55,13 @@ const getRiskColor = (level: string) => {
     return 'text-text-primary';
 };
 
-const VitalsComparisonChart: React.FC<{ vitals: Vitals; bmi: number }> = ({ vitals, bmi }) => {
+const VitalsComparisonChart: React.FC<{ vitals: Vitals; bmi: number; nationalAverage: typeof GLOBAL_POPULATION_AVERAGES }> = ({ vitals, bmi, nationalAverage }) => {
     const data = [
-        { subject: 'Systolic BP', user: vitals.systolicBP, average: POPULATION_AVERAGES.systolicBP, fullMark: 200 },
-        { subject: 'Diastolic BP', user: vitals.diastolicBP, average: POPULATION_AVERAGES.diastolicBP, fullMark: 120 },
-        { subject: 'Glucose', user: vitals.bloodGlucose, average: POPULATION_AVERAGES.bloodGlucose, fullMark: 180 },
-        { subject: 'Cholesterol', user: vitals.cholesterol, average: POPULATION_AVERAGES.cholesterol, fullMark: 300 },
-        { subject: 'BMI', user: parseFloat(bmi.toFixed(1)), average: POPULATION_AVERAGES.bmi, fullMark: 40 },
+        { subject: 'Systolic BP', user: vitals.systolicBP, national: nationalAverage.systolicBP, global: GLOBAL_POPULATION_AVERAGES.systolicBP, fullMark: 200 },
+        { subject: 'Diastolic BP', user: vitals.diastolicBP, national: nationalAverage.diastolicBP, global: GLOBAL_POPULATION_AVERAGES.diastolicBP, fullMark: 120 },
+        { subject: 'Glucose', user: vitals.bloodGlucose, national: nationalAverage.bloodGlucose, global: GLOBAL_POPULATION_AVERAGES.bloodGlucose, fullMark: 180 },
+        { subject: 'Cholesterol', user: vitals.cholesterol, national: nationalAverage.cholesterol, global: GLOBAL_POPULATION_AVERAGES.cholesterol, fullMark: 300 },
+        { subject: 'BMI', user: parseFloat(bmi.toFixed(1)), national: nationalAverage.bmi, global: GLOBAL_POPULATION_AVERAGES.bmi, fullMark: 40 },
     ];
 
     return (
@@ -73,7 +73,8 @@ const VitalsComparisonChart: React.FC<{ vitals: Vitals; bmi: number }> = ({ vita
                 <Tooltip contentStyle={{ backgroundColor: 'var(--color-secondary)', border: '1px solid var(--color-accent)', borderRadius: '0.5rem' }} />
                 <Legend wrapperStyle={{fontSize: "12px"}} />
                 <Radar name="Your Vitals" dataKey="user" stroke="var(--color-highlight)" fill="var(--color-highlight)" fillOpacity={0.6} />
-                <Radar name="Population Avg" dataKey="average" stroke="var(--color-danger)" fill="var(--color-danger)" fillOpacity={0.4} />
+                <Radar name="National Avg" dataKey="national" stroke="var(--color-warning)" fill="var(--color-warning)" fillOpacity={0.4} />
+                <Radar name="Global Avg" dataKey="global" stroke="var(--color-danger)" fill="var(--color-danger)" fillOpacity={0.2} />
             </RadarChart>
         </ResponsiveContainer>
     );
@@ -171,7 +172,11 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
     const [isLoading, setIsLoading] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<HealthRecord | null>(null);
 
-    const countryData = useMemo(() => COUNTRIES.find(c => c.name === userProfile.country) || COUNTRIES[0], [userProfile.country]);
+    const { countryData, nationalAverage } = useMemo(() => {
+        const data = COUNTRIES.find(c => c.code === userProfile.country) || COUNTRIES[0];
+        const averages = NATIONAL_POPULATION_AVERAGES[data.code] || NATIONAL_POPULATION_AVERAGES['DEFAULT'];
+        return { countryData: data, nationalAverage: averages };
+    }, [userProfile.country]);
 
     const validateVitals = (name: string, value: number) => {
         const newWarnings = { ...warnings };
@@ -353,8 +358,8 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
                     <BluetoothManager onReceiveReading={handleBPReading} />
                     <div className="bg-secondary p-6 rounded-lg shadow-lg">
                         <h2 className="text-2xl font-semibold mb-4 text-highlight">Vitals Snapshot</h2>
-                        <p className="text-center text-light mb-4 text-sm">Your key vitals compared to population averages.</p>
-                        <VitalsComparisonChart vitals={vitals} bmi={bmi} />
+                        <p className="text-center text-light mb-4 text-sm">Your key vitals vs. National & Global averages.</p>
+                        <VitalsComparisonChart vitals={vitals} bmi={bmi} nationalAverage={nationalAverage} />
                     </div>
                 </div>
             </div>
@@ -366,11 +371,25 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
                         <p className="text-light">Your BMI</p>
                         <p className={`text-5xl font-bold ${bmiColor}`}>{bmi > 0 ? bmi.toFixed(1) : '-'}</p>
                         <p className={`font-semibold ${bmiColor}`}>{bmiCategory}</p>
-                        <div className="mt-4 text-sm text-light">
-                            <p>For your height, a healthy weight range is approximately <strong className="text-text-primary">{idealMin.toFixed(1)} kg</strong> to <strong className="text-text-primary">{idealMax.toFixed(1)} kg</strong>.</p>
+                        
+                        <div className="mt-4 text-sm text-light border-t border-accent pt-4">
+                            <p>For your height, a healthy weight range is approx. <strong className="text-text-primary">{idealMin.toFixed(1)} kg</strong> to <strong className="text-text-primary">{idealMax.toFixed(1)} kg</strong>.</p>
                             {weightToChange > 0 && <p className="mt-2">Target to lose: <strong className="text-warning">{weightToChange.toFixed(1)} kg</strong> to reach a healthy BMI of 24.9.</p>}
                              {weightToChange < 0 && <p className="mt-2">Target to gain: <strong className="text-warning">{Math.abs(weightToChange).toFixed(1)} kg</strong> to reach a healthy BMI of 18.5.</p>}
                         </div>
+
+                         <div className="mt-4 text-sm text-light border-t border-accent pt-4">
+                             <div className="flex justify-around">
+                                 <div className="px-2">
+                                     <p>National Avg BMI</p>
+                                     <p className="font-bold text-lg text-warning">{nationalAverage.bmi.toFixed(1)}</p>
+                                 </div>
+                                  <div className="px-2">
+                                     <p>Global Avg BMI</p>
+                                     <p className="font-bold text-lg text-danger">{GLOBAL_POPULATION_AVERAGES.bmi.toFixed(1)}</p>
+                                 </div>
+                             </div>
+                         </div>
                      </div>
                 </div>
                 <IdealVitalsGuide userProfile={userProfile} />

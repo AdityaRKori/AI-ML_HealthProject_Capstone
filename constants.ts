@@ -14,13 +14,21 @@ export const COUNTRIES = [
     { code: 'MX', name: 'Mexico', cities: ['Mexico City', 'Guadalajara'], emergencyNumber: '911' },
 ];
 
-export const POPULATION_AVERAGES = {
+export const GLOBAL_POPULATION_AVERAGES = {
     systolicBP: 125,
     diastolicBP: 82,
     bloodGlucose: 100,
     cholesterol: 210,
     bmi: 26.5
 };
+
+export const NATIONAL_POPULATION_AVERAGES: { [key: string]: typeof GLOBAL_POPULATION_AVERAGES } = {
+    'IN': { systolicBP: 128, diastolicBP: 83, bloodGlucose: 105, cholesterol: 200, bmi: 28.0 },
+    'US': { systolicBP: 122, diastolicBP: 80, bloodGlucose: 98, cholesterol: 220, bmi: 28.8 },
+    'CN': { systolicBP: 130, diastolicBP: 85, bloodGlucose: 110, cholesterol: 190, bmi: 25.5 },
+    'DEFAULT': GLOBAL_POPULATION_AVERAGES, // Fallback for other countries
+};
+
 
 export const BLOOD_PRESSURE_CATEGORIES = [
     { name: 'Low', max: 89, color: 'bg-blue-500' },

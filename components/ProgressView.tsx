@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import type { UserProfile, HealthRecord, AITrendAnalysis } from '../types';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area } from 'recharts';
-import { POPULATION_AVERAGES, VITAL_CHART_RANGES } from '../constants';
+// FIX: Changed POPULATION_AVERAGES to GLOBAL_POPULATION_AVERAGES as it is the correct exported constant.
+import { GLOBAL_POPULATION_AVERAGES, VITAL_CHART_RANGES } from '../constants';
 import { getAITrendAnalysis } from '../services/apiService';
 
 interface ProgressViewProps {
@@ -207,28 +208,32 @@ const ProgressView: React.FC<ProgressViewProps> = ({ userProfile }) => {
                         data={chartFormattedData} 
                         dataKey="systolicBP" 
                         title="Blood Pressure (Systolic) Trend" 
-                        populationAverage={POPULATION_AVERAGES.systolicBP}
+                        // FIX: Changed POPULATION_AVERAGES to GLOBAL_POPULATION_AVERAGES
+                        populationAverage={GLOBAL_POPULATION_AVERAGES.systolicBP}
                         healthyRange={VITAL_CHART_RANGES.systolicBP}
                     />
                     <VitalTrendChart 
                         data={chartFormattedData} 
                         dataKey="Glucose" 
                         title="Blood Glucose Trend" 
-                        populationAverage={POPULATION_AVERAGES.bloodGlucose}
+                        // FIX: Changed POPULATION_AVERAGES to GLOBAL_POPULATION_AVERAGES
+                        populationAverage={GLOBAL_POPULATION_AVERAGES.bloodGlucose}
                         healthyRange={VITAL_CHART_RANGES.bloodGlucose}
                     />
                      <VitalTrendChart 
                         data={chartFormattedData} 
                         dataKey="BMI" 
                         title="BMI Trend" 
-                        populationAverage={POPULATION_AVERAGES.bmi}
+                        // FIX: Changed POPULATION_AVERAGES to GLOBAL_POPULATION_AVERAGES
+                        populationAverage={GLOBAL_POPULATION_AVERAGES.bmi}
                         healthyRange={VITAL_CHART_RANGES.bmi}
                     />
                      <VitalTrendChart 
                         data={chartFormattedData} 
                         dataKey="Cholesterol" 
                         title="Cholesterol Trend" 
-                        populationAverage={POPULATION_AVERAGES.cholesterol}
+                        // FIX: Changed POPULATION_AVERAGES to GLOBAL_POPULATION_AVERAGES
+                        populationAverage={GLOBAL_POPULATION_AVERAGES.cholesterol}
                         healthyRange={VITAL_CHART_RANGES.cholesterol}
                     />
                 </div>
