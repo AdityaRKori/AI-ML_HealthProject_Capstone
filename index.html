@@ -37,6 +37,26 @@
         --color-danger: #EF4444;
       }
 
+      /* Pulsing animation for map dots */
+      @keyframes pulse {
+        0% {
+            transform: scale(1);
+            filter: brightness(100%);
+        }
+        50% {
+            transform: scale(1.1);
+            filter: brightness(150%);
+        }
+        100% {
+            transform: scale(1);
+            filter: brightness(100%);
+        }
+      }
+      .pulse {
+          animation: pulse 2.5s infinite ease-in-out;
+          transform-origin: center center;
+      }
+
       /* Scrollbar styles */
       ::-webkit-scrollbar {
         width: 8px;

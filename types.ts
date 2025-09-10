@@ -157,3 +157,63 @@ export interface AITrendAnalysis {
     areasForImprovement: string[];
     dynamicRecommendations: string[];
 }
+
+export interface GlobalTrendingStats {
+    trendingDiseaseName: string;
+    highestCases: { country: string; value: number; };
+    lowestCases: { country: string; value: number; };
+    highestDeaths: { country: string; value: number; };
+    lowestDeaths: { country: string; value: number; };
+    highestCures: { country: string; value: number; };
+    userCountryStats: { cases: number; deaths: number; cures: number; };
+    userCityStats: { cases: number; };
+}
+
+export interface CityLiveFeedEvent {
+    id: string;
+    time: string;
+    disease: string;
+    area: string;
+    severity: 'Mild' | 'Moderate' | 'Severe';
+}
+
+export interface SearchedDiseaseStats {
+    diseaseName: string;
+    totalGlobalCases: number;
+    countryBreakdown: {
+        country: string;
+        cases: number;
+        deaths: number;
+        cures: number;
+    }[];
+    recognizedDrugs: string[];
+    symptoms: string[];
+    whoGuidelines: {
+        prevention: string[];
+        treatment: string[];
+    };
+}
+
+export interface LiveDiseaseCase {
+    id: string;
+    disease: string;
+    country: string;
+    lat: number;
+    lon: number;
+    cases: number;
+    severity: 'Mild' | 'Moderate' | 'Severe' | 'Critical';
+}
+
+export interface HealthNewsArticle {
+    title: string;
+    summary: string;
+    source: string;
+    url: string;
+    publishedAt: string;
+    imageUrl?: string;
+}
+
+export interface GroundingSource {
+    uri: string;
+    title: string;
+}
