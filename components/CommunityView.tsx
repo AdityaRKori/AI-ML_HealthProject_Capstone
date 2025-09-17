@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { UserProfile, RegionalHealthData, ThematicData, TrendingDisease, GlobalDiseaseStat, DiseaseFactSheet, RegionalTopicData, CommunityStats } from '../types';
 import { getTrendingDiseases, getRegionalHealthData, getThematicMapData, getGlobalDiseaseStats, getDiseaseFactSheet, getRegionalTopicData, getCommunityStats } from '../services/apiService';
 import KarnatakaMap from './KarnatakaMap';
+import IndiaMap from './IndiaMap';
 import AirQualityReport from './AirQualityReport';
 import TopicReport from './TopicReport';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
@@ -140,7 +141,7 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     
-    const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+    const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
     const [regionalAqiData, setRegionalAqiData] = useState<RegionalHealthData | null>(null);
     const [regionalTopicData, setRegionalTopicData] = useState<RegionalTopicData | null>(null);
     const [isRegionDataLoading, setIsRegionDataLoading] = useState(false);
@@ -148,6 +149,12 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
     const [thematicTopic, setThematicTopic] = useState<(typeof THEMATIC_TOPICS)[number]['id']>(THEMATIC_TOPICS[0].id);
     const [thematicData, setThematicData] = useState<ThematicData | null>(null);
     const [isThematicDataLoading, setIsThematicDataLoading] = useState(false);
+    
+    const [activeMap, setActiveMap] = useState<'my_region' | 'india'>('my_region');
+
+    const isKarnatakaUser = userProfile.country === 'IN' && userProfile.city === 'Bangalore';
+    const mapScope = activeMap === 'my_region' ? (isKarnatakaUser ? 'Karnataka' : 'India') : 'India';
+    const regionTypeForApi = mapScope === 'Karnataka' ? 'karnataka_districts' : 'india_states';
 
     useEffect(() => {
         const fetchInitialData = async () => {
@@ -176,8 +183,11 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
         const fetchThematicData = async () => {
             if (!thematicTopic) return;
             setIsThematicDataLoading(true);
+            setSelectedRegion(null);
+            setRegionalAqiData(null);
+            setRegionalTopicData(null);
             try {
-                const data = await getThematicMapData(thematicTopic as any);
+                const data = await getThematicMapData(thematicTopic as any, regionTypeForApi);
                 setThematicData(data);
             } catch (err) {
                 console.error(`Failed to fetch thematic data for ${thematicTopic}:`, err);
@@ -187,34 +197,34 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
             }
         };
         fetchThematicData();
-    }, [thematicTopic]);
+    }, [thematicTopic, regionTypeForApi]);
     
-    const handleDistrictSelect = async (districtName: string) => {
-        setSelectedDistrict(districtName);
+    const handleRegionSelect = async (regionName: string) => {
+        setSelectedRegion(regionName);
         setIsRegionDataLoading(true);
         setRegionalAqiData(null);
         setRegionalTopicData(null);
         
         try {
             if (thematicTopic === 'air_pollution') {
-                const data = await getRegionalHealthData(districtName);
+                const data = await getRegionalHealthData(regionName);
                 setRegionalAqiData(data);
             } else {
-                const data = await getRegionalTopicData(districtName, thematicTopic);
+                const data = await getRegionalTopicData(regionName, thematicTopic);
                 setRegionalTopicData(data);
             }
         } catch (err) {
             console.error("Failed to fetch regional data:", err);
-            setError(`Could not load AI analysis for ${districtName}.`);
+            setError(`Could not load AI analysis for ${regionName}.`);
         } finally {
             setIsRegionDataLoading(false);
         }
     };
     
-    // FIX: Renamed local Legend component to ThematicMapLegend to avoid conflict with recharts' Legend component.
     const ThematicMapLegend = ({ data }: { data: ThematicData | null }) => {
         if (!data) return null;
         const values = Object.values(data).map(d => d.value);
+        if (values.length === 0) return null;
         const min = Math.min(...values);
         const max = Math.max(...values);
         return (
@@ -235,7 +245,7 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
         <div className="space-y-8 animate-fade-in">
             <div>
                 <h1 className="text-3xl font-bold text-text-primary">Community Health Dashboard</h1>
-                <p className="text-light">AI-simulated public health data for Karnataka.</p>
+                <p className="text-light">AI-simulated public health data for {userProfile.city}, {userProfile.country}.</p>
             </div>
             
             {error && <div className="text-center p-4 bg-danger/20 text-danger rounded-lg">{error}</div>}
@@ -275,14 +285,30 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
             
             <div className="bg-secondary p-6 rounded-lg shadow-lg">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-4">
-                    <h2 className="text-2xl font-bold text-highlight">Interactive Health Map: Karnataka</h2>
-                    <select
-                        value={thematicTopic}
-                        onChange={(e) => setThematicTopic(e.target.value as any)}
-                        className="bg-accent text-text-primary border-transparent rounded-md shadow-sm focus:ring-highlight focus:border-highlight p-2 text-sm"
-                    >
-                        {THEMATIC_TOPICS.map(topic => <option key={topic.id} value={topic.id}>{topic.name}</option>)}
-                    </select>
+                    <h2 className="text-2xl font-bold text-highlight">Interactive Health Map: {mapScope}</h2>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1 bg-primary p-1 rounded-lg">
+                            <button
+                                onClick={() => setActiveMap('my_region')}
+                                className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeMap === 'my_region' ? 'bg-highlight text-white' : 'text-light hover:bg-accent'}`}
+                            >
+                                My Region
+                            </button>
+                            <button
+                                onClick={() => setActiveMap('india')}
+                                className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeMap === 'india' ? 'bg-highlight text-white' : 'text-light hover:bg-accent'}`}
+                            >
+                                India
+                            </button>
+                        </div>
+                        <select
+                            value={thematicTopic}
+                            onChange={(e) => setThematicTopic(e.target.value as any)}
+                            className="bg-accent text-text-primary border-transparent rounded-md shadow-sm focus:ring-highlight focus:border-highlight p-2 text-sm"
+                        >
+                            {THEMATIC_TOPICS.map(topic => <option key={topic.id} value={topic.id}>{topic.name}</option>)}
+                        </select>
+                    </div>
                 </div>
                 <div className="flex justify-center mb-4">
                     {isThematicDataLoading ? <p className="text-sm text-light">Loading map data...</p> : <ThematicMapLegend data={thematicData} />}
@@ -291,24 +317,29 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
                     <div className="lg:col-span-3 w-full h-auto relative">
                         {isThematicDataLoading && <div className="absolute inset-0 bg-secondary/50 flex items-center justify-center rounded-lg"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-highlight"></div></div>}
-                        <KarnatakaMap onDistrictSelect={handleDistrictSelect} selectedDistrict={selectedDistrict} thematicData={thematicData} />
+                        
+                        {mapScope === 'Karnataka' ? (
+                            <KarnatakaMap onDistrictSelect={handleRegionSelect} selectedDistrict={selectedRegion} thematicData={thematicData} />
+                        ) : (
+                            <IndiaMap onStateSelect={handleRegionSelect} selectedState={selectedRegion} thematicData={thematicData} />
+                        )}
                     </div>
                     <div className="lg:col-span-2">
                         {isRegionDataLoading && (
                             <div className="text-center p-8 bg-accent rounded-lg">
                                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-highlight mx-auto"></div>
-                                <p className="mt-4 text-text-primary text-sm">AI is analyzing {selectedDistrict}...</p>
+                                <p className="mt-4 text-text-primary text-sm">AI is analyzing {selectedRegion}...</p>
                             </div>
                         )}
                         {regionalAqiData && !isRegionDataLoading && (
-                           <AirQualityReport data={regionalAqiData} district={selectedDistrict!} />
+                           <AirQualityReport data={regionalAqiData} district={selectedRegion!} />
                         )}
                          {regionalTopicData && !isRegionDataLoading && (
-                           <TopicReport data={regionalTopicData} district={selectedDistrict!} />
+                           <TopicReport data={regionalTopicData} district={selectedRegion!} />
                         )}
-                        {!selectedDistrict && !isRegionDataLoading && (
+                        {!selectedRegion && !isRegionDataLoading && (
                             <div className="text-center p-8 bg-accent rounded-lg h-full flex flex-col justify-center">
-                                <p className="text-light">Click on a district to view detailed, AI-powered environmental and health insights.</p>
+                                <p className="text-light">Click on a {mapScope === 'Karnataka' ? 'district' : 'state'} to view detailed, AI-powered environmental and health insights.</p>
                             </div>
                         )}
                     </div>

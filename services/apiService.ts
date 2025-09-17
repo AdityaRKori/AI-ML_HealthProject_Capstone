@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import type { Vitals, UserProfile, RiskPrediction, CommunityData, WorldPopulation, CoachSettings, TrendingDisease, GlobalDiseaseStat, RegionalHealthData, ThematicData, DiseaseFactSheet, RegionalTopicData, CommunityStats, ImageType, HealthRecord, AITrendAnalysis, GlobalTrendingStats, CityLiveFeedEvent, SearchedDiseaseStats, LiveDiseaseCase, HealthNewsArticle, GroundingSource } from '../types';
+import { KARNATAKA_DISTRICTS, INDIA_STATES_UTS } from '../constants';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -467,17 +468,24 @@ export async function getDiseaseFactSheet(diseaseName: string): Promise<DiseaseF
     return withCache(cacheKey, apiCall);
 }
 
-export async function getThematicMapData(topic: 'air_pollution' | 'seasonal_diseases' | 'water_borne_diseases'): Promise<ThematicData> {
-    const cacheKey = `thematic-map-data-${topic}`;
+export async function getThematicMapData(
+    topic: 'air_pollution' | 'seasonal_diseases' | 'water_borne_diseases',
+    regionType: 'india_states' | 'karnataka_districts'
+): Promise<ThematicData> {
+    const cacheKey = `thematic-map-data-${topic}-${regionType}`;
     const apiCall = async (): Promise<ThematicData> => {
         try {
-            const districts = ["Bagalkot", "Bangalore Rural", "Bangalore Urban", "Belgaum", "Bellary", "Bidar", "Bijapur", "Chamarajanagar", "Chikkaballapur", "Chikmagalur", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Gulbarga", "Hassan", "Haveri", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysore", "Raichur", "Ramanagara", "Shimoga", "Tumkur", "Udupi", "Uttara Kannada", "Yadgir"];
+            const regions = regionType === 'karnataka_districts' ? KARNATAKA_DISTRICTS : INDIA_STATES_UTS;
+            const regionName = regionType === 'karnataka_districts' ? 'district in Karnataka' : 'state or union territory in India';
+            
             const topicDescription = {
                 air_pollution: "current average Air Quality Index (AQI)",
                 seasonal_diseases: "simulated number of seasonal disease cases (like flu, dengue) per 100,000 people",
                 water_borne_diseases: "simulated number of water-borne disease cases (like cholera, typhoid) per 100,000 people"
             };
-            const prompt = `For each district in Karnataka, provide a realistic, simulated value for the following topic: "${topicDescription[topic]}". The values should show realistic geographical variation (e.g., urban areas might have worse air quality). Respond as a JSON object where each key is a district name.`;
+            
+            const prompt = `For each ${regionName}, provide a realistic, simulated value for the following topic: "${topicDescription[topic]}". The values should show realistic geographical variation (e.g., urban areas might have worse air quality). The list of regions is: ${regions.join(', ')}. Respond as a JSON object where each key is a region name.`;
+
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
                 contents: prompt,
@@ -485,8 +493,8 @@ export async function getThematicMapData(topic: 'air_pollution' | 'seasonal_dise
                     responseMimeType: "application/json",
                     responseSchema: {
                         type: Type.OBJECT,
-                        properties: districts.reduce((acc, district) => {
-                            acc[district] = {
+                        properties: regions.reduce((acc, region) => {
+                            acc[region] = {
                                 type: Type.OBJECT,
                                 properties: {
                                     value: { type: Type.INTEGER, description: `The numeric value for the topic.` },
@@ -502,18 +510,18 @@ export async function getThematicMapData(topic: 'air_pollution' | 'seasonal_dise
             return JSON.parse(response.text.trim());
         } catch (error) {
             console.error("Failed to fetch thematic map data from Gemini:", error);
-            const districts = ["Bagalkot", "Bangalore Rural", "Bangalore Urban", "Belgaum", "Bellary", "Bidar", "Bijapur", "Chamarajanagar", "Chikkaballapur", "Chikmagalur", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Gulbarga", "Hassan", "Haveri", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysore", "Raichur", "Ramanagara", "Shimoga", "Tumkur", "Udupi", "Uttara Kannada", "Yadgir"];
+            const regions = regionType === 'karnataka_districts' ? KARNATAKA_DISTRICTS : INDIA_STATES_UTS;
             const fallbackData: ThematicData = {};
-            districts.forEach(district => {
+            regions.forEach(region => {
                 let value, label;
                 if (topic === 'air_pollution') {
-                    value = district.includes('Bangalore') ? Math.floor(Math.random() * 50) + 100 : Math.floor(Math.random() * 80) + 30;
+                    value = region.includes('Bangalore') || region.includes('Delhi') ? Math.floor(Math.random() * 50) + 100 : Math.floor(Math.random() * 80) + 30;
                     label = `${value} AQI`;
                 } else {
                     value = Math.floor(Math.random() * 100) + 10;
                     label = `${value} cases`;
                 }
-                fallbackData[district] = { value, label };
+                fallbackData[region] = { value, label };
             });
             return fallbackData;
         }
