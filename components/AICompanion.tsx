@@ -65,6 +65,7 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
         if (!isSpeechSupported) return;
         // FIX: Cast window to 'any' to access vendor-prefixed SpeechRecognition APIs without TypeScript errors.
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) return;
         recognitionRef.current = new SpeechRecognition();
         recognitionRef.current.continuous = false;
         recognitionRef.current.interimResults = false;

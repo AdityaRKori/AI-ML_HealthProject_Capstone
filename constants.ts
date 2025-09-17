@@ -77,67 +77,129 @@ export const GENETIC_MARKERS_DATA: Omit<GeneticMarker, 'userHas'>[] = [
     }
 ];
 
-// In a typical setup, this file would be renamed to constants.tsx to allow JSX syntax.
-export const ICONS: { [key: string]: React.ReactElement } = {
-    logo: React.createElement("svg", { viewBox: "0 0 64 64", fill: "none", xmlns: "http://www.w3.org/2000/svg" }, 
-        React.createElement("circle", { cx: "32", cy: "32", r: "28", stroke: "currentColor", strokeWidth: "4" }),
-        React.createElement("path", { d: "M32 12C32 12 40 24 40 32C40 40 32 52 32 52", stroke: "currentColor", strokeWidth: "4", strokeLinecap: "round" }),
-        React.createElement("path", { d: "M32 12C32 12 24 24 24 32C24 40 32 52 32 52", stroke: "currentColor", strokeWidth: "4", strokeLinecap: "round" }),
-        React.createElement("circle", { cx: "32", cy: "32", r: "4", fill: "currentColor" })
-    ),
-    dashboard: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M9 19v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6M4 6h16M4 10h16M4 14h16M4 18h16" })),
-    community: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" })),
-    progress: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" })),
-    chat: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" })),
-    methodology: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" })),
-    send: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z", clipRule: "evenodd" })),
-    upload: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" })),
-    user: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" })),
-    bot: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M12 6V5c7 0 7 3 7 4s0 4-7 4-7-1-7-4 0-4 7-4zm0 14c-3.333 0-5-1.333-5-4s1.667-4 5-4 5 1.333 5 4-1.667 4-5 4z" })),
-    settings: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" }), React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M15 12a3 3 0 11-6 0 3 3 0 016 0z" })),
-    imageAnalysis: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 10L3 3" })),
-    warning: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" })),
-    chevronDown: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement("path", { fillRule: "evenodd", d: "M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z", clipRule: "evenodd" })),
-    sun: React.createElement("svg", { xmlns:"http://www.w3.org/2000/svg", className:"h-6 w-6", fill:"none", viewBox:"0 0 24 24", stroke:"currentColor" }, React.createElement("path", { strokeLinecap:"round", strokeLinejoin:"round", strokeWidth:2, d:"M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" })),
-    moon: React.createElement("svg", { xmlns:"http://www.w3.org/2000/svg", className:"h-6 w-6", fill:"none", viewBox:"0 0 24 24", stroke:"currentColor" }, React.createElement("path", { strokeLinecap:"round", strokeLinejoin:"round", strokeWidth:2, d:"M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" })),
-    report: React.createElement("svg", { xmlns:"http://www.w3.org/2000/svg", className:"h-6 w-6", fill:"none", viewBox:"0 0 24 24", stroke:"currentColor" }, React.createElement("path", { strokeLinecap:"round", strokeLinejoin:"round", strokeWidth:2, d:"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" })),
-    world: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-8 w-8", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h8a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.707 4.293l.707-.707a2 2 0 012.828 0l.707.707M15.293 4.293l.707.707a2 2 0 002.828 0l.707-.707M4 11a9 9 0 1016 0H4z" })),
-    flag: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-8 w-8", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" })),
-    microphone: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement("path", { fillRule: "evenodd", d: "M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm5 10.5a.5.5 0 01.5.5v.5a.5.5 0 01-1 0V15a.5.5 0 01.5-.5zM8 15a.5.5 0 00-1 0v.5a.5.5 0 001 0V15zM10 18a5 5 0 005-5h-1a4 4 0 01-8 0H5a5 5 0 005 5z", clipRule: "evenodd" })),
-    speaker: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement("path", { d: "M10 3.25a.75.75 0 01.75.75v12a.75.75 0 01-1.5 0V4A.75.75 0 0110 3.25zM4.75 5.5a.75.75 0 000 1.5h.5a.75.75 0 000-1.5h-.5zM14.75 5.5a.75.75 0 000 1.5h.5a.75.75 0 000-1.5h-.5zM5.5 8a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5A.75.75 0 015.5 8zm9.5 0a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5a.75.75 0 01-.75-.75zM8 10.5a.75.75 0 000 1.5h.5a.75.75 0 000-1.5H8zm3.5 0a.75.75 0 000 1.5h.5a.75.75 0 000-1.5h-.5z" })),
-    stop: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z", clipRule: "evenodd" })),
-    globalStats: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m0 0a9 9 0 019-9m-9 9a9 9 0 009 9m-9-9V3m0 9v9m6-15l-3 6 3 6" })),
-    news: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2zM9 12h6m-6 4h6m2-12H7" })),
-    battery: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement("path", { d: "M3 6a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V6z" }), React.createElement("path", { d: "M17 9a1 1 0 100 2h.01a1 1 0 100-2H17z" })),
-    connected: React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M5 13l4 4L19 7" })),
-};
+export const DEFAULT_DASHBOARD_BG_URL = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZDEiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjpyZ2IoMTAyLDEyNiwyMzQpO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOnJnYigxMTgsNzUsMTYyKTtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSJ1cmwoI2dyYWQxKSIgLz4KPC9zdmc+Cg==';
 
-export const DISEASE_INFO = {
-    'Type 2 Diabetes': {
-        description: 'A chronic condition that affects how your body metabolizes sugar (glucose), your body\'s main source of fuel. Your body either resists the effects of insulin — a hormone that regulates the movement of sugar into your cells — or doesn\'t produce enough insulin to maintain normal glucose levels.',
-        prevention: [
-            'Maintain a healthy weight through a balanced diet and regular exercise.',
-            'Eat a diet rich in whole grains, fruits, and vegetables.',
-            'Limit intake of sugary drinks and processed foods.',
-            'Get at least 150 minutes of moderate aerobic exercise per week.'
-        ],
-    },
-    'Cardiovascular Disease': {
-        description: 'Refers to a range of conditions affecting the heart and blood vessels. It is usually associated with a build-up of fatty deposits inside the arteries (atherosclerosis) and an increased risk of blood clots.',
-        prevention: [
-            'Maintain healthy blood pressure and cholesterol levels.',
-            'Do not smoke and avoid secondhand smoke.',
-            'Engage in regular physical activity.',
-            'Eat a heart-healthy diet low in saturated fats, trans fats, and sodium.'
-        ],
-    },
-    'Hypertension': {
-        description: 'Also known as high blood pressure, it is a long-term medical condition in which the blood pressure in the arteries is persistently elevated. It is a major risk factor for coronary artery disease, stroke, and heart failure.',
-        prevention: [
-            'Reduce salt intake.',
-            'Limit alcohol consumption.',
-            'Eat a diet rich in fruits, vegetables, and low-fat dairy products.',
-            'Regularly monitor your blood pressure.'
-        ],
-    },
+// FIX: Converted JSX to React.createElement calls to be valid in a .ts file and resolve parsing errors.
+export const ICONS: { [key: string]: React.ReactElement } = {
+    logo: React.createElement('svg', { viewBox: "0 0 24 24", fill: "currentColor", className: "w-full h-full" },
+        React.createElement('path', { d: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" }),
+        React.createElement('path', { d: "M3.5 12h5l2-4 3 6 2.5-3.5h4", stroke: "var(--color-secondary)", strokeWidth: "1.5", fill: "none" })
+    ),
+    dashboard: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-full h-full" },
+        React.createElement('rect', { x: "3", y: "3", width: "7", height: "7" }),
+        React.createElement('rect', { x: "14", y: "3", width: "7", height: "7" }),
+        React.createElement('rect', { x: "14", y: "14", width: "7", height: "7" }),
+        React.createElement('rect', { x: "3", y: "14", width: "7", height: "7" })
+    ),
+    imageAnalysis: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-full h-full" },
+        React.createElement('circle', { cx: "11", cy: "11", r: "8" }),
+        React.createElement('line', { x1: "21", y1: "21", x2: "16.65", y2: "16.65" }),
+        React.createElement('rect', { x: "4", y: "4", width: "6", height: "6", strokeWidth: "1.5" })
+    ),
+    community: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-full h-full" },
+        React.createElement('path', { d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" }),
+        React.createElement('circle', { cx: "9", cy: "7", r: "4" }),
+        React.createElement('path', { d: "M23 21v-2a4 4 0 0 0-3-3.87" }),
+        React.createElement('path', { d: "M16 3.13a4 4 0 0 1 0 7.75" })
+    ),
+    globalStats: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-full h-full" },
+        React.createElement('circle', { cx: "12", cy: "12", r: "10" }),
+        React.createElement('line', { x1: "2", y1: "12", x2: "22", y2: "12" }),
+        React.createElement('path', { d: "M12 2a15.3 15.3 0 0 1 4 18 15.3 15.3 0 0 1-8 0 15.3 15.3 0 0 1 4-18z" })
+    ),
+    progress: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-full h-full" },
+        React.createElement('polyline', { points: "23 6 13.5 15.5 8.5 10.5 1 18" }),
+        React.createElement('polyline', { points: "17 6 23 6 23 12" })
+    ),
+    chat: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-full h-full" },
+        React.createElement('path', { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" })
+    ),
+    methodology: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-full h-full" },
+        React.createElement('path', { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }),
+        React.createElement('path', { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" })
+    ),
+    report: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-full h-full" },
+        React.createElement('path', { d: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" }),
+        React.createElement('polyline', { points: "14 2 14 8 20 8" }),
+        React.createElement('line', { x1: "16", y1: "13", x2: "8", y2: "13" }),
+        React.createElement('line', { x1: "16", y1: "17", x2: "8", y2: "17" }),
+        React.createElement('polyline', { points: "10 9 9 9 8 9" })
+    ),
+    warning: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-full h-full" },
+        React.createElement('path', { d: "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" }),
+        React.createElement('line', { x1: "12", y1: "9", x2: "12", y2: "13" }),
+        React.createElement('line', { x1: "12", y1: "17", x2: "12.01", y2: "17" })
+    ),
+    chevronDown: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-4 h-4" },
+        React.createElement('polyline', { points: "6 9 12 15 18 9" })
+    ),
+    world: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-10 h-10" },
+        React.createElement('circle', { cx: "12", cy: "12", r: "10" }),
+        React.createElement('line', { x1: "2", y1: "12", x2: "22", y2: "12" }),
+        React.createElement('path', { d: "M12 2a15.3 15.3 0 0 1 4 18 15.3 15.3 0 0 1-8 0 15.3 15.3 0 0 1 4-18z" })
+    ),
+    flag: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-10 h-10" },
+        React.createElement('path', { d: "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" }),
+        React.createElement('line', { x1: "4", y1: "22", x2: "4", y2: "15" })
+    ),
+    settings: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-5 h-5" },
+        React.createElement('circle', { cx: "12", cy: "12", r: "3" }),
+        React.createElement('path', { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" })
+    ),
+    bot: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-5 h-5" },
+        React.createElement('path', { d: "M12 8V4H8" }),
+        React.createElement('rect', { x: "4", y: "12", width: "16", height: "8", rx: "2" }),
+        React.createElement('path', { d: "M4 14H2" }),
+        React.createElement('path', { d: "M20 14H22" }),
+        React.createElement('path', { d: "M15 7h2" }),
+        React.createElement('path', { d: "M7 7h2" })
+    ),
+    stop: React.createElement('svg', { viewBox: "0 0 24 24", fill: "currentColor", className: "w-4 h-4" },
+        React.createElement('rect', { x: "6", y: "6", width: "12", height: "12", rx: "2" })
+    ),
+    speaker: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-4 h-4" },
+        React.createElement('polygon', { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }),
+        React.createElement('path', { d: "M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" })
+    ),
+    user: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-5 h-5" },
+        React.createElement('path', { d: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" }),
+        React.createElement('circle', { cx: "12", cy: "7", r: "4" })
+    ),
+    upload: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-8 h-8" },
+        React.createElement('path', { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }),
+        React.createElement('polyline', { points: "17 8 12 3 7 8" }),
+        React.createElement('line', { x1: "12", y1: "3", x2: "12", y2: "15" })
+    ),
+    sun: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-6 h-6" },
+        React.createElement('circle', { cx: "12", cy: "12", r: "5" }),
+        React.createElement('line', { x1: "12", y1: "1", x2: "12", y2: "3" }),
+        React.createElement('line', { x1: "12", y1: "21", x2: "12", y2: "23" }),
+        React.createElement('line', { x1: "4.22", y1: "4.22", x2: "5.64", y2: "5.64" }),
+        React.createElement('line', { x1: "18.36", y1: "18.36", x2: "19.78", y2: "19.78" }),
+        React.createElement('line', { x1: "1", y1: "12", x2: "3", y2: "12" }),
+        React.createElement('line', { x1: "21", y1: "12", x2: "23", y2: "12" }),
+        React.createElement('line', { x1: "4.22", y1: "19.78", x2: "5.64", y2: "18.36" }),
+        React.createElement('line', { x1: "18.36", y1: "5.64", x2: "19.78", y2: "4.22" })
+    ),
+    moon: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-6 h-6" },
+        React.createElement('path', { d: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" })
+    ),
+    connected: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-4 h-4" },
+        React.createElement('path', { d: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" }),
+        React.createElement('circle', { cx: "12", cy: "12", r: "3" })
+    ),
+    battery: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-5 h-5" },
+        React.createElement('rect', { x: "1", y: "6", width: "18", height: "12", rx: "2", ry: "2" }),
+        React.createElement('line', { x1: "23", y1: "13", x2: "23", y2: "11" })
+    ),
+    microphone: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-5 h-5" },
+        React.createElement('path', { d: "M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" }),
+        React.createElement('path', { d: "M19 10v2a7 7 0 0 1-14 0v-2" }),
+        React.createElement('line', { x1: "12", y1: "19", x2: "12", y2: "23" }),
+        React.createElement('line', { x1: "8", y1: "23", x2: "16", y2: "23" })
+    ),
+    send: React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "w-5 h-5" },
+        React.createElement('line', { x1: "22", y1: "2", x2: "11", y2: "13" }),
+        React.createElement('polygon', { points: "22 2 15 22 11 13 2 9 22 2" })
+    ),
 };

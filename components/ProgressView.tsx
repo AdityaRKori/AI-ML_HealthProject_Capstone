@@ -208,7 +208,6 @@ const ProgressView: React.FC<ProgressViewProps> = ({ userProfile }) => {
                         data={chartFormattedData} 
                         dataKey="systolicBP" 
                         title="Blood Pressure (Systolic) Trend" 
-                        // FIX: Changed POPULATION_AVERAGES to GLOBAL_POPULATION_AVERAGES
                         populationAverage={GLOBAL_POPULATION_AVERAGES.systolicBP}
                         healthyRange={VITAL_CHART_RANGES.systolicBP}
                     />
@@ -216,7 +215,6 @@ const ProgressView: React.FC<ProgressViewProps> = ({ userProfile }) => {
                         data={chartFormattedData} 
                         dataKey="Glucose" 
                         title="Blood Glucose Trend" 
-                        // FIX: Changed POPULATION_AVERAGES to GLOBAL_POPULATION_AVERAGES
                         populationAverage={GLOBAL_POPULATION_AVERAGES.bloodGlucose}
                         healthyRange={VITAL_CHART_RANGES.bloodGlucose}
                     />
@@ -224,7 +222,6 @@ const ProgressView: React.FC<ProgressViewProps> = ({ userProfile }) => {
                         data={chartFormattedData} 
                         dataKey="BMI" 
                         title="BMI Trend" 
-                        // FIX: Changed POPULATION_AVERAGES to GLOBAL_POPULATION_AVERAGES
                         populationAverage={GLOBAL_POPULATION_AVERAGES.bmi}
                         healthyRange={VITAL_CHART_RANGES.bmi}
                     />
@@ -232,7 +229,6 @@ const ProgressView: React.FC<ProgressViewProps> = ({ userProfile }) => {
                         data={chartFormattedData} 
                         dataKey="Cholesterol" 
                         title="Cholesterol Trend" 
-                        // FIX: Changed POPULATION_AVERAGES to GLOBAL_POPULATION_AVERAGES
                         populationAverage={GLOBAL_POPULATION_AVERAGES.cholesterol}
                         healthyRange={VITAL_CHART_RANGES.cholesterol}
                     />

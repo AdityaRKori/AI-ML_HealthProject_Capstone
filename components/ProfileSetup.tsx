@@ -82,6 +82,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({ onProfileSetup, existingPro
                 allergies,
                 geneticMarkers,
                 healthNotes: existingProfile?.healthNotes || [],
+                dashboardBackgroundUrl: existingProfile?.dashboardBackgroundUrl,
             });
         }
     };

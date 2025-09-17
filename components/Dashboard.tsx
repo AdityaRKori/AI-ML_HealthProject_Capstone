@@ -60,7 +60,7 @@ const NavItem: React.FC<NavItemProps> = ({ view, activeView, icon, label, onClic
         className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors duration-200 w-full ${activeView === view ? 'bg-gradient-theme text-white' : 'text-light hover:bg-accent'}`}
         title={label}
     >
-        {icon}
+        <div className="w-6 h-6">{icon}</div>
         <span className="text-xs mt-1">{label}</span>
     </button>
 );
@@ -112,9 +112,9 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onProfileUpdate, onE
 
     return (
         <div className="flex h-screen bg-primary">
-            <nav className="w-24 bg-secondary p-4 flex flex-col items-center space-y-4">
+            <nav className="w-24 bg-secondary p-4 flex flex-col items-center space-y-2">
                  <div className="flex flex-col items-center text-highlight mb-4" aria-label="AI Health Tracker Logo">
-                    <div className="w-16 h-16">
+                    <div className="w-12 h-12">
                         {ICONS.logo}
                     </div>
                 </div>
@@ -127,7 +127,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onProfileUpdate, onE
                 <NavItem view="methodology" activeView={activeView} onClick={setActiveView} icon={ICONS.methodology} label="About" />
                 { userProfile.healthHistory.length > 0 && <NavItem view="healthReport" activeView={activeView} onClick={setActiveView} icon={ICONS.report} label="Report" /> }
                 
-                <div className="mt-auto w-full space-y-4">
+                <div className="mt-auto w-full space-y-2">
                     <ThemeSwitcher />
                      <div className="text-center text-light">
                         <p className="text-sm font-bold">{userProfile.name}</p>

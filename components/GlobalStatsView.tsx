@@ -59,7 +59,7 @@ const UserStatCard: React.FC<UserStatCardProps> = ({ stats, userProfile }) => {
     return (
         <div className="bg-accent p-4 rounded-lg">
             <h3 className="font-bold text-lg text-text-primary">{stats.userCountryStats ? `${stats.trendingDiseaseName} in ${userProfile.country} / ${userProfile.city}` : 'Loading...'}</h3>
-            <div className="grid grid-cols-3 gap-2 mt-2 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 text-center">
                 <div>
                     <p className="text-sm text-light">Country Cases</p>
                     <p className="text-2xl font-bold text-highlight"><AnimatedCounter targetValue={stats.userCountryStats?.cases || 0} /></p>

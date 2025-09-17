@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import type { UserProfile, Vitals, RiskAnalysis, HealthRecord, BluetoothDeviceState } from '../types';
 import { predictHealthRisks } from '../services/mlService';
 import { getAIHealthAnalysis } from '../services/apiService';
-import { calculateBMI, getBMICategory, getIdealWeightRange } from '../utils/helpers';
+import { calculateBMI, getBMICategory, getIdealWeightRange, getBase64 } from '../utils/helpers';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip, Legend } from 'recharts';
 import { GLOBAL_POPULATION_AVERAGES, NATIONAL_POPULATION_AVERAGES, COUNTRIES, ICONS } from '../constants';
 import BluetoothManager from './BluetoothManager';
@@ -171,12 +171,35 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
     const [emergency, setEmergency] = useState<{ type: 'bp' | 'glucose'; message: string; firstAid: React.ReactNode } | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<HealthRecord | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const { countryData, nationalAverage } = useMemo(() => {
         const data = COUNTRIES.find(c => c.code === userProfile.country) || COUNTRIES[0];
         const averages = NATIONAL_POPULATION_AVERAGES[data.code] || NATIONAL_POPULATION_AVERAGES['DEFAULT'];
         return { countryData: data, nationalAverage: averages };
     }, [userProfile.country]);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            try {
+                const { data, mimeType } = await getBase64(file);
+                const dataUrl = `data:${mimeType};base64,${data}`;
+                const updatedProfile = {
+                    ...userProfile,
+                    dashboardBackgroundUrl: dataUrl,
+                };
+                onProfileUpdate(updatedProfile);
+            } catch (error) {
+                console.error("Failed to process image:", error);
+            }
+        }
+    };
+
+    const handleRemoveImage = () => {
+        const { dashboardBackgroundUrl, ...rest } = userProfile;
+        onProfileUpdate(rest);
+    };
 
     const validateVitals = (name: string, value: number) => {
         const newWarnings = { ...warnings };
@@ -318,7 +341,40 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
                     firstAid={emergency.firstAid}
                 />
             )}
-            <h1 className="text-3xl font-bold text-text-primary">Health Check-up</h1>
+            <div 
+                className="relative h-48 bg-secondary rounded-lg shadow-lg bg-cover bg-center group"
+                style={{ backgroundImage: userProfile.dashboardBackgroundUrl ? `url(${userProfile.dashboardBackgroundUrl})` : 'none' }}
+                aria-label="Dashboard background banner"
+            >
+                <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center">
+                    <h1 className="text-4xl font-bold text-white drop-shadow-lg">Health Check-up</h1>
+                </div>
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                    <button 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="bg-black/50 text-white text-xs px-2 py-1 rounded hover:bg-black/80"
+                        aria-label="Change dashboard background"
+                    >
+                        Change BG
+                    </button>
+                    {userProfile.dashboardBackgroundUrl && (
+                        <button 
+                            onClick={handleRemoveImage}
+                            className="bg-danger/80 text-white text-xs px-2 py-1 rounded hover:bg-danger"
+                            aria-label="Remove dashboard background"
+                        >
+                            Remove
+                        </button>
+                    )}
+                </div>
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleImageUpload} 
+                    accept="image/png, image/jpeg" 
+                    className="hidden" 
+                />
+            </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Vitals Input */}

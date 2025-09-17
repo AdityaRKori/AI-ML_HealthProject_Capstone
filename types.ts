@@ -15,6 +15,7 @@ export interface UserProfile {
     allergies: string[];
     geneticMarkers: GeneticMarker[];
     healthNotes?: string[];
+    dashboardBackgroundUrl?: string;
 }
 
 export interface Vitals {

@@ -211,7 +211,7 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
         }
     };
     
-    // Fix: Renamed local Legend component to ThematicMapLegend to avoid conflict with recharts' Legend component.
+    // FIX: Renamed local Legend component to ThematicMapLegend to avoid conflict with recharts' Legend component.
     const ThematicMapLegend = ({ data }: { data: ThematicData | null }) => {
         if (!data) return null;
         const values = Object.values(data).map(d => d.value);
