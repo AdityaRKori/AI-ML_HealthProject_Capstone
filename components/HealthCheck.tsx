@@ -4,7 +4,7 @@ import { predictHealthRisks } from '../services/mlService';
 import { getAIHealthAnalysis } from '../services/apiService';
 import { calculateBMI, getBMICategory, getIdealWeightRange, getBase64 } from '../utils/helpers';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip, Legend } from 'recharts';
-import { GLOBAL_POPULATION_AVERAGES, NATIONAL_POPULATION_AVERAGES, COUNTRIES, ICONS } from '../constants';
+import { GLOBAL_POPULATION_AVERAGES, NATIONAL_POPULATION_AVERAGES, COUNTRIES, ICONS, DEFAULT_DASHBOARD_BG_URL } from '../constants';
 import BluetoothManager from './BluetoothManager';
 import BloodPressureMeter from './BloodPressureMeter';
 
@@ -343,7 +343,7 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
             )}
             <div 
                 className="relative h-48 bg-secondary rounded-lg shadow-lg bg-cover bg-center group"
-                style={{ backgroundImage: userProfile.dashboardBackgroundUrl ? `url(${userProfile.dashboardBackgroundUrl})` : 'none' }}
+                style={{ backgroundImage: `url(${userProfile.dashboardBackgroundUrl || DEFAULT_DASHBOARD_BG_URL})` }}
                 aria-label="Dashboard background banner"
             >
                 <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center">

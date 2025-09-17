@@ -7,6 +7,7 @@ import ProgressView from './ProgressView';
 import ImageAnalysis from './ImageAnalysis';
 import HealthReport from './HealthReport';
 import GlobalStatsView from './GlobalStatsView';
+import HealthNewsView from './HealthNewsView';
 import ThemeSwitcher from './ThemeSwitcher';
 import { ICONS } from '../constants';
 
@@ -74,7 +75,7 @@ interface DashboardProps {
     onEditProfile: () => void;
 }
 
-type View = 'healthCheck' | 'imageAnalysis' | 'community' | 'progress' | 'aiCompanion' | 'methodology' | 'healthReport' | 'globalStats';
+type View = 'healthCheck' | 'imageAnalysis' | 'community' | 'progress' | 'aiCompanion' | 'methodology' | 'healthReport' | 'globalStats' | 'healthNews';
 
 const Dashboard: React.FC<DashboardProps> = ({ userProfile, onProfileUpdate, onEditProfile }) => {
     const [activeView, setActiveView] = useState<View>('healthCheck');
@@ -95,6 +96,8 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onProfileUpdate, onE
                 return <CommunityView userProfile={userProfile} />;
             case 'globalStats':
                 return <GlobalStatsView userProfile={userProfile} />;
+            case 'healthNews':
+                return <HealthNewsView />;
             case 'progress':
                 return <ProgressView userProfile={userProfile} />;
             case 'aiCompanion':
@@ -122,6 +125,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onProfileUpdate, onE
                 <NavItem view="imageAnalysis" activeView={activeView} onClick={setActiveView} icon={ICONS.imageAnalysis} label="Imaging" />
                 <NavItem view="community" activeView={activeView} onClick={setActiveView} icon={ICONS.community} label="Community" />
                 <NavItem view="globalStats" activeView={activeView} onClick={setActiveView} icon={ICONS.globalStats} label="Global" />
+                <NavItem view="healthNews" activeView={activeView} onClick={setActiveView} icon={ICONS.news} label="News" />
                 <NavItem view="progress" activeView={activeView} onClick={setActiveView} icon={ICONS.progress} label="Progress" />
                 <NavItem view="aiCompanion" activeView={activeView} onClick={setActiveView} icon={ICONS.chat} label="AI Companion" />
                 <NavItem view="methodology" activeView={activeView} onClick={setActiveView} icon={ICONS.methodology} label="About" />

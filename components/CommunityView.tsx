@@ -3,6 +3,8 @@ import type { UserProfile, RegionalHealthData, ThematicData, TrendingDisease, Gl
 import { getTrendingDiseases, getRegionalHealthData, getThematicMapData, getGlobalDiseaseStats, getDiseaseFactSheet, getRegionalTopicData, getCommunityStats } from '../services/apiService';
 import KarnatakaMap from './KarnatakaMap';
 import IndiaMap from './IndiaMap';
+import MaharashtraMap from './MaharashtraMap';
+import WorldMap from './WorldMap';
 import AirQualityReport from './AirQualityReport';
 import TopicReport from './TopicReport';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
@@ -134,6 +136,8 @@ const THEMATIC_TOPICS = [
     { id: 'water_borne_diseases', name: 'Water-Borne Diseases' },
 ];
 
+type MapType = 'my_region' | 'karnataka' | 'maharashtra' | 'india' | 'world';
+
 const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
     const [communityStats, setCommunityStats] = useState<CommunityStats | null>(null);
     const [trendingDiseases, setTrendingDiseases] = useState<TrendingDisease[]>([]);
@@ -150,11 +154,32 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
     const [thematicData, setThematicData] = useState<ThematicData | null>(null);
     const [isThematicDataLoading, setIsThematicDataLoading] = useState(false);
     
-    const [activeMap, setActiveMap] = useState<'my_region' | 'india'>('my_region');
+    const [activeMap, setActiveMap] = useState<MapType>('my_region');
 
-    const isKarnatakaUser = userProfile.country === 'IN' && userProfile.city === 'Bangalore';
-    const mapScope = activeMap === 'my_region' ? (isKarnatakaUser ? 'Karnataka' : 'India') : 'India';
-    const regionTypeForApi = mapScope === 'Karnataka' ? 'karnataka_districts' : 'india_states';
+    const userRegion = userProfile.country === 'IN' && userProfile.city === 'Bangalore' ? 'karnataka' : 'india';
+    
+    const { mapScope, regionTypeForApi, mapName, regionUnit } = React.useMemo(() => {
+        let scope: 'karnataka' | 'maharashtra' | 'india' | 'world' = 'india';
+        if (activeMap === 'my_region') {
+            scope = userRegion;
+        } else {
+            scope = activeMap as 'karnataka' | 'maharashtra' | 'india' | 'world';
+        }
+        
+        const config = {
+            karnataka: { type: 'karnataka_districts', name: 'Karnataka', unit: 'district' },
+            maharashtra: { type: 'maharashtra_districts', name: 'Maharashtra', unit: 'district' },
+            india: { type: 'india_states', name: 'India', unit: 'state' },
+            world: { type: 'world_countries', name: 'World', unit: 'country' },
+        };
+
+        return {
+            mapScope: scope,
+            regionTypeForApi: config[scope].type as any,
+            mapName: config[scope].name,
+            regionUnit: config[scope].unit,
+        };
+    }, [activeMap, userRegion]);
 
     useEffect(() => {
         const fetchInitialData = async () => {
@@ -200,6 +225,12 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
     }, [thematicTopic, regionTypeForApi]);
     
     const handleRegionSelect = async (regionName: string) => {
+        if (selectedRegion === regionName) {
+            setSelectedRegion(null);
+            setRegionalAqiData(null);
+            setRegionalTopicData(null);
+            return;
+        }
         setSelectedRegion(regionName);
         setIsRegionDataLoading(true);
         setRegionalAqiData(null);
@@ -236,6 +267,29 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
             </div>
         );
     };
+
+    const renderMap = () => {
+        switch (mapScope) {
+            case 'karnataka':
+                return <KarnatakaMap onDistrictSelect={handleRegionSelect} selectedDistrict={selectedRegion} thematicData={thematicData} />;
+            case 'maharashtra':
+                return <MaharashtraMap onDistrictSelect={handleRegionSelect} selectedDistrict={selectedRegion} thematicData={thematicData} />;
+            case 'india':
+                return <IndiaMap onStateSelect={handleRegionSelect} selectedState={selectedRegion} thematicData={thematicData} />;
+            case 'world':
+                return <WorldMap onCountrySelect={handleRegionSelect} selectedCountry={selectedRegion} thematicData={thematicData} />;
+            default:
+                return <IndiaMap onStateSelect={handleRegionSelect} selectedState={selectedRegion} thematicData={thematicData} />;
+        }
+    };
+    
+    const mapOptions: { value: MapType; label: string }[] = [
+        { value: 'my_region', label: `My Region (${userRegion === 'karnataka' ? 'Karnataka' : 'India'})` },
+        { value: 'karnataka', label: 'Karnataka' },
+        { value: 'maharashtra', label: 'Maharashtra' },
+        { value: 'india', label: 'India' },
+        { value: 'world', label: 'World' }
+    ];
 
     if (isLoading) {
         return <div className="text-center p-8"> <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-highlight mx-auto"></div> <p className="mt-4 text-text-primary">Fetching community health data...</p></div>;
@@ -285,22 +339,15 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
             
             <div className="bg-secondary p-6 rounded-lg shadow-lg">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-4">
-                    <h2 className="text-2xl font-bold text-highlight">Interactive Health Map: {mapScope}</h2>
+                    <h2 className="text-2xl font-bold text-highlight">Interactive Health Map: {mapName}</h2>
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1 bg-primary p-1 rounded-lg">
-                            <button
-                                onClick={() => setActiveMap('my_region')}
-                                className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeMap === 'my_region' ? 'bg-highlight text-white' : 'text-light hover:bg-accent'}`}
-                            >
-                                My Region
-                            </button>
-                            <button
-                                onClick={() => setActiveMap('india')}
-                                className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeMap === 'india' ? 'bg-highlight text-white' : 'text-light hover:bg-accent'}`}
-                            >
-                                India
-                            </button>
-                        </div>
+                         <select
+                            value={activeMap}
+                            onChange={(e) => setActiveMap(e.target.value as MapType)}
+                            className="bg-accent text-text-primary border-transparent rounded-md shadow-sm focus:ring-highlight focus:border-highlight p-2 text-sm"
+                        >
+                            {mapOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                        </select>
                         <select
                             value={thematicTopic}
                             onChange={(e) => setThematicTopic(e.target.value as any)}
@@ -317,12 +364,7 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
                     <div className="lg:col-span-3 w-full h-auto relative">
                         {isThematicDataLoading && <div className="absolute inset-0 bg-secondary/50 flex items-center justify-center rounded-lg"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-highlight"></div></div>}
-                        
-                        {mapScope === 'Karnataka' ? (
-                            <KarnatakaMap onDistrictSelect={handleRegionSelect} selectedDistrict={selectedRegion} thematicData={thematicData} />
-                        ) : (
-                            <IndiaMap onStateSelect={handleRegionSelect} selectedState={selectedRegion} thematicData={thematicData} />
-                        )}
+                        {renderMap()}
                     </div>
                     <div className="lg:col-span-2">
                         {isRegionDataLoading && (
@@ -339,7 +381,7 @@ const CommunityView: React.FC<CommunityViewProps> = ({ userProfile }) => {
                         )}
                         {!selectedRegion && !isRegionDataLoading && (
                             <div className="text-center p-8 bg-accent rounded-lg h-full flex flex-col justify-center">
-                                <p className="text-light">Click on a {mapScope === 'Karnataka' ? 'district' : 'state'} to view detailed, AI-powered environmental and health insights.</p>
+                                <p className="text-light">Click on a {regionUnit} to view detailed, AI-powered environmental and health insights.</p>
                             </div>
                         )}
                     </div>

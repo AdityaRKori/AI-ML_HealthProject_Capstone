@@ -1,6 +1,6 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import type { Vitals, UserProfile, RiskPrediction, CommunityData, WorldPopulation, CoachSettings, TrendingDisease, GlobalDiseaseStat, RegionalHealthData, ThematicData, DiseaseFactSheet, RegionalTopicData, CommunityStats, ImageType, HealthRecord, AITrendAnalysis, GlobalTrendingStats, CityLiveFeedEvent, SearchedDiseaseStats, LiveDiseaseCase, HealthNewsArticle, GroundingSource } from '../types';
-import { KARNATAKA_DISTRICTS, INDIA_STATES_UTS } from '../constants';
+import { KARNATAKA_DISTRICTS, INDIA_STATES_UTS, MAHARASHTRA_DISTRICTS, WORLD_COUNTRIES } from '../constants';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -470,13 +470,21 @@ export async function getDiseaseFactSheet(diseaseName: string): Promise<DiseaseF
 
 export async function getThematicMapData(
     topic: 'air_pollution' | 'seasonal_diseases' | 'water_borne_diseases',
-    regionType: 'india_states' | 'karnataka_districts'
+    regionType: 'india_states' | 'karnataka_districts' | 'maharashtra_districts' | 'world_countries'
 ): Promise<ThematicData> {
     const cacheKey = `thematic-map-data-${topic}-${regionType}`;
     const apiCall = async (): Promise<ThematicData> => {
         try {
-            const regions = regionType === 'karnataka_districts' ? KARNATAKA_DISTRICTS : INDIA_STATES_UTS;
-            const regionName = regionType === 'karnataka_districts' ? 'district in Karnataka' : 'state or union territory in India';
+            const regionsMap = {
+                india_states: { list: INDIA_STATES_UTS, name: 'state or union territory in India' },
+                karnataka_districts: { list: KARNATAKA_DISTRICTS, name: 'district in Karnataka' },
+                maharashtra_districts: { list: MAHARASHTRA_DISTRICTS, name: 'district in Maharashtra' },
+                world_countries: { list: WORLD_COUNTRIES, name: 'country' }
+            };
+
+            const selectedRegionSet = regionsMap[regionType];
+            const regions = selectedRegionSet.list;
+            const regionName = selectedRegionSet.name;
             
             const topicDescription = {
                 air_pollution: "current average Air Quality Index (AQI)",
@@ -510,12 +518,12 @@ export async function getThematicMapData(
             return JSON.parse(response.text.trim());
         } catch (error) {
             console.error("Failed to fetch thematic map data from Gemini:", error);
-            const regions = regionType === 'karnataka_districts' ? KARNATAKA_DISTRICTS : INDIA_STATES_UTS;
+            const regions = (regionType === 'karnataka_districts' ? KARNATAKA_DISTRICTS : regionType === 'maharashtra_districts' ? MAHARASHTRA_DISTRICTS : regionType === 'world_countries' ? WORLD_COUNTRIES : INDIA_STATES_UTS);
             const fallbackData: ThematicData = {};
             regions.forEach(region => {
                 let value, label;
                 if (topic === 'air_pollution') {
-                    value = region.includes('Bangalore') || region.includes('Delhi') ? Math.floor(Math.random() * 50) + 100 : Math.floor(Math.random() * 80) + 30;
+                    value = region.includes('Bangalore') || region.includes('Delhi') || region.includes('Mumbai') ? Math.floor(Math.random() * 50) + 100 : Math.floor(Math.random() * 80) + 30;
                     label = `${value} AQI`;
                 } else {
                     value = Math.floor(Math.random() * 100) + 10;
@@ -529,11 +537,11 @@ export async function getThematicMapData(
     return withCache(cacheKey, apiCall);
 }
 
-export async function getRegionalTopicData(district: string, topic: string): Promise<RegionalTopicData> {
-    const cacheKey = `regional-topic-data-${district}-${topic}`;
+export async function getRegionalTopicData(regionName: string, topic: string): Promise<RegionalTopicData> {
+    const cacheKey = `regional-topic-data-${regionName}-${topic}`;
     const apiCall = async (): Promise<RegionalTopicData> => {
         try {
-            const prompt = `Generate a plausible, simulated health report for the district of ${district}, Karnataka, focusing specifically on the topic of "${topic}". The report should include a title, a disclaimer about the data being a simulation, a brief analysis of the current situation for that topic, and 2-3 key statistics relevant to it. Respond as a JSON object.`;
+            const prompt = `Generate a plausible, simulated health report for the region of ${regionName}, focusing specifically on the topic of "${topic}". The report should include a title, a disclaimer about the data being a simulation, a brief analysis of the current situation for that topic, and 2-3 key statistics relevant to it. Respond as a JSON object.`;
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
                 contents: prompt,
@@ -563,7 +571,7 @@ export async function getRegionalTopicData(district: string, topic: string): Pro
             });
             return JSON.parse(response.text.trim());
         } catch (err) {
-            console.error(`Failed to fetch topic data for ${district} from Gemini:`, err);
+            console.error(`Failed to fetch topic data for ${regionName} from Gemini:`, err);
             throw new Error(`Failed to fetch topic data`);
         }
     };
@@ -571,14 +579,14 @@ export async function getRegionalTopicData(district: string, topic: string): Pro
 }
 
 
-export async function getRegionalHealthData(district: string): Promise<RegionalHealthData> {
-    const cacheKey = `regional-health-data-${district}`;
+export async function getRegionalHealthData(regionName: string): Promise<RegionalHealthData> {
+    const cacheKey = `regional-health-data-${regionName}`;
     const apiCall = async (): Promise<RegionalHealthData> => {
         try {
             const prompt = `
-                Generate a plausible, simulated health and environmental report for the district of ${district}, Karnataka for today.
+                Generate a plausible, simulated health and environmental report for the region of ${regionName} for today.
                 Your response MUST be a single JSON object that adheres to the provided schema.
-                The data should be realistic and reflect the characteristics of the district (e.g., urban vs. rural).
+                The data should be realistic and reflect the characteristics of the region (e.g., urban vs. rural, country vs. city).
 
                 - disclaimer: Start with "This is a real-time AI simulation, not data from live sensors."
                 - analysis: Provide a clear correlation between the environmental factors (like weather and pollutants) and how they can influence local health risks and disease trends.
@@ -800,12 +808,7 @@ export async function getLiveGlobalCases(): Promise<LiveDiseaseCase[]> {
     const cacheKey = 'live-global-cases';
     const apiCall = async (): Promise<LiveDiseaseCase[]> => {
         try {
-            const prompt = `
-                Generate a plausible, simulated dataset of 15 live, ongoing infectious disease outbreaks around the world.
-                The data must be diverse, covering at least 5 different diseases (e.g., COVID-19, Influenza, Dengue, Cholera, Measles) and various continents.
-                Each data point must include a unique ID, disease name, country, latitude, longitude, the number of active cases (ranging from 50 to 50000), and a severity level ('Mild', 'Moderate', 'Severe', 'Critical').
-                Provide the response as a JSON array of objects.
-            `;
+            const prompt = `Generate a plausible, simulated "live" feed of 25 global infectious disease cases. Provide diverse locations (lat/lon), diseases, and severities. Respond as a JSON array of objects.`;
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
                 contents: prompt,
@@ -832,18 +835,16 @@ export async function getLiveGlobalCases(): Promise<LiveDiseaseCase[]> {
             return JSON.parse(response.text.trim());
         } catch (error) {
             console.error("Failed to fetch live global cases from Gemini:", error);
+// FIX: A function whose declared type is neither 'undefined', 'void', nor 'any' must return a value.
             return [
-                { id: "1", disease: "Influenza", country: "USA", lat: 39.8283, lon: -98.5795, cases: 12000, severity: "Moderate" },
-                { id: "2", disease: "Dengue", country: "Brazil", lat: -14.2350, lon: -51.9253, cases: 8500, severity: "Severe" },
-                { id: "3", disease: "COVID-19", country: "India", lat: 20.5937, lon: 78.9629, cases: 25000, severity: "Moderate" },
-                { id: "4", disease: "Cholera", country: "Nigeria", lat: 9.0820, lon: 8.6753, cases: 1500, severity: "Critical" },
-                { id: "5", disease: "Measles", country: "DRC", lat: -4.0383, lon: 21.7587, cases: 3500, severity: "Severe" },
-                { id: "6", disease: "Influenza", country: "Australia", lat: -25.2744, lon: 133.7751, cases: 5500, severity: "Mild" },
-                { id: "7", disease: "COVID-19", country: "UK", lat: 55.3781, lon: -3.4360, cases: 9800, severity: "Moderate" },
+                { id: `fallback-1-${Date.now()}`, disease: "Influenza", country: "United States", lat: 39.8283, lon: -98.5795, cases: 125, severity: "Moderate" },
+                { id: `fallback-2-${Date.now()}`, disease: "COVID-19", country: "India", lat: 20.5937, lon: 78.9629, cases: 88, severity: "Mild" },
+                { id: `fallback-3-${Date.now()}`, disease: "Dengue", country: "Brazil", lat: -14.2350, lon: -51.9253, cases: 210, severity: "Severe" },
             ];
         }
     };
-    return withCache(cacheKey, apiCall);
+// FIX: A function whose declared type is neither 'undefined', 'void', nor 'any' must return a value.
+    return withCache(cacheKey, apiCall, 110 * 1000); // 110 seconds cache
 }
 
 export async function getHealthNews(): Promise<{ articles: HealthNewsArticle[], sources: GroundingSource[] }> {
@@ -851,55 +852,73 @@ export async function getHealthNews(): Promise<{ articles: HealthNewsArticle[], 
     const apiCall = async (): Promise<{ articles: HealthNewsArticle[], sources: GroundingSource[] }> => {
         try {
             const prompt = `
-                Act as a health news aggregator AI. Find the top 5 most recent and significant global health news articles from the last 24 hours.
-                Topics must include new disease outbreaks, major medical research breakthroughs, or significant public health alerts.
-                For each article, provide:
-                1. A title.
-                2. A concise 2-3 sentence summary.
-                3. The original source publication name (e.g., "Reuters", "WHO").
-                4. The direct URL to the article.
-                5. A relative publication time (e.g., "3 hours ago").
-                6. A direct, publicly accessible URL to a high-quality, relevant image for the article. The URL must end in .jpg, .jpeg, .png, or .webp. If no suitable image is found, provide an empty string "".
-
-                If the original source is not in English, you MUST translate the title and summary to English.
-                Respond with ONLY a valid JSON array of objects that adheres to the schema.
+                As a health news analyst, use Google Search to find the top 5 most important and recent global health news articles.
+                For each article, provide a title, a concise summary (2-3 sentences), the source name, the direct URL, a relative published date (e.g., "3 hours ago"), and an image URL if available.
+                
+                Respond ONLY with a single, valid JSON object. This object must have a key "articles" which is an array of 5 article objects.
+                Do not include any introductory text, markdown formatting like \`\`\`json, or any explanations. Your entire response should be the JSON object itself.
+                
+                Example format:
+                {
+                  "articles": [
+                    {
+                      "title": "Example Title",
+                      "summary": "Example summary.",
+                      "source": "Example Source",
+                      "url": "http://example.com",
+                      "publishedAt": "1h ago",
+                      "imageUrl": "http://example.com/image.jpg"
+                    }
+                  ]
+                }
             `;
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
                 contents: prompt,
                 config: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.ARRAY,
-                        items: {
-                            type: Type.OBJECT,
-                            properties: {
-                                title: { type: Type.STRING },
-                                summary: { type: Type.STRING },
-                                source: { type: Type.STRING },
-                                url: { type: Type.STRING },
-                                publishedAt: { type: Type.STRING },
-                                imageUrl: { type: Type.STRING, description: "A direct URL to a relevant image." }
-                            },
-                            required: ["title", "summary", "source", "url", "publishedAt", "imageUrl"]
-                        }
-                    },
-                    tools: [{googleSearch: {}}],
-                }
+                    tools: [{ googleSearch: {} }],
+                },
             });
 
+            let jsonText = response.text.trim();
+            if (jsonText.startsWith('```json')) {
+                jsonText = jsonText.substring(7, jsonText.length - 3).trim();
+            }
+
+            const result = JSON.parse(jsonText);
+            const articles: HealthNewsArticle[] = result.articles || [];
+            
             const rawSources = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
             const sources: GroundingSource[] = rawSources.map((s: any) => ({
-                uri: s.web.uri,
-                title: s.web.title
-            })).filter((s: GroundingSource) => s.uri);
-
-            const articles: HealthNewsArticle[] = JSON.parse(response.text.trim());
+                uri: s.web?.uri || '',
+                title: s.web?.title || ''
+            })).filter((s: GroundingSource) => s.uri && s.uri.trim() !== '');
 
             return { articles, sources };
+
         } catch (error) {
             console.error("Failed to fetch health news from Gemini:", error);
-            throw new Error('Failed to fetch health news');
+            return {
+                articles: [
+                    {
+                        title: "Global Health Initiative Launched to Combat Tropical Diseases",
+                        summary: "A new coalition of governments and NGOs announced a multi-billion dollar fund to accelerate research and distribution of treatments for neglected tropical diseases. The initiative aims to eradicate two specific diseases by 2030.",
+                        source: "World Health News (Fallback)",
+                        url: "#",
+                        publishedAt: "2h ago",
+                        imageUrl: undefined
+                    },
+                    {
+                        title: "Study Finds Link Between Air Quality and Cognitive Decline in Elderly",
+                        summary: "A decade-long study published in 'The Lancet' has shown a strong correlation between prolonged exposure to PM2.5 pollutants and an increased risk of dementia and other cognitive impairments in individuals over 65.",
+                        source: "Science Daily (Fallback)",
+                        url: "#",
+                        publishedAt: "8h ago",
+                        imageUrl: undefined
+                    }
+                ],
+                sources: [{ uri: "#", title: "Fallback Data Source" }]
+            };
         }
     };
     return withCache(cacheKey, apiCall);
