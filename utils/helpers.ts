@@ -1,7 +1,7 @@
 import type { UserProfile, CoachSettings } from './types';
 
-const USER_PROFILE_KEY = 'oracleHealthUserProfile';
-const COACH_SETTINGS_KEY = 'oracleCoachSettings';
+const USER_PROFILE_KEY = 'aiHealthTrackerUserProfile';
+const COACH_SETTINGS_KEY = 'aiHealthTrackerCoachSettings';
 
 export function saveUserProfile(profile: UserProfile): void {
     try {

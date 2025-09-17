@@ -1,6 +1,6 @@
 {
-  "name": "The Oracle: AI Health Risk Predictor",
-  "description": "A sophisticated, AI-driven health platform designed to predict, analyze, and communicate health risks. It functions as both a powerful analytical tool and a personalized health companion, leveraging a unique synergy between specialized machine learning models and an advanced generative AI.",
+  "name": "AI Agentic Personalised Health Tracker",
+  "description": "An agentic, AI-driven health platform designed to track, analyze, and provide personalized health insights. It functions as a powerful analytical tool and a personalized health companion, leveraging advanced generative AI to help you manage your health journey.",
   "requestFramePermissions": [
     "bluetooth",
     "microphone"

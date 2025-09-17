@@ -57,7 +57,7 @@ interface NavItemProps {
 const NavItem: React.FC<NavItemProps> = ({ view, activeView, icon, label, onClick }) => (
     <button
         onClick={() => onClick(view)}
-        className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors duration-200 w-full ${activeView === view ? 'bg-highlight text-white' : 'text-light hover:bg-accent'}`}
+        className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors duration-200 w-full ${activeView === view ? 'bg-gradient-theme text-white' : 'text-light hover:bg-accent'}`}
         title={label}
     >
         {icon}
@@ -113,7 +113,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onProfileUpdate, onE
     return (
         <div className="flex h-screen bg-primary">
             <nav className="w-24 bg-secondary p-4 flex flex-col items-center space-y-4">
-                 <div className="flex flex-col items-center text-highlight mb-4" aria-label="The Oracle Logo">
+                 <div className="flex flex-col items-center text-highlight mb-4" aria-label="AI Health Tracker Logo">
                     <div className="w-16 h-16">
                         {ICONS.logo}
                     </div>

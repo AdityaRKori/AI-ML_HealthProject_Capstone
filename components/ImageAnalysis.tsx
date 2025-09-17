@@ -1,10 +1,9 @@
-
 import React, { useState, useRef } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import { ICONS } from '../constants';
 import type { ChestXRayAnalysis, SkinLesionAnalysis, ImageType } from '../types';
 import { analyzeChestXRay, analyzeSkinLesion } from '../services/mlService';
-import { getImageAnalysis, validateImageType } from '../services/apiService';
+import { getImageAnalysis } from '../services/apiService';
 import { processMedicalImageFile } from '../utils/helpers';
 
 const ImageAnalysis: React.FC = () => {
@@ -73,12 +72,6 @@ const Analyzer: React.FC<AnalyzerProps> = ({ title, description, imageType, mlAn
             // Process file for preview and analysis data
             const { data: base64Image, mimeType } = await processMedicalImageFile(imageFile);
 
-            // AI-powered content validation
-            const isValid = await validateImageType(base64Image, mimeType, imageType);
-            if (!isValid) {
-                throw new Error(`Invalid image content. Please upload a valid ${imageType.replace('-', ' ')}.`);
-            }
-
             // Run ML simulation and get full AI analysis
             const mlResult = await mlAnalyzer(imageFile);
             const prompt = promptGenerator(mlResult.predictions ? mlResult.predictions[0] : mlResult);
@@ -125,7 +118,7 @@ const Analyzer: React.FC<AnalyzerProps> = ({ title, description, imageType, mlAn
             )}
 
             <div className="flex gap-2 mt-auto pt-4">
-                <button onClick={handleAnalysis} disabled={!imageFile || isLoading} className="w-full bg-highlight text-white font-bold py-3 rounded-lg hover:opacity-90 disabled:bg-gray-500 transition-colors">
+                <button onClick={handleAnalysis} disabled={!imageFile || isLoading} className="w-full bg-gradient-theme text-white font-bold py-3 rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors">
                     {isLoading ? 'Analyzing...' : 'Analyze Image'}
                 </button>
                 {imageFile && 

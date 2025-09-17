@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { getChatCompletion, getSummaryFromChat } from '../services/apiService';
 import { ICONS } from '../constants';
@@ -228,7 +227,7 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
                             <button onClick={() => setIsSettingsOpen(false)} className="px-4 py-2 rounded-lg text-text-primary hover:bg-accent transition-colors">
                                 Cancel
                             </button>
-                            <button onClick={handleSaveSettings} className="px-4 py-2 rounded-lg bg-primary-action text-primary-action-text font-bold hover:opacity-90 transition-colors">
+                            <button onClick={handleSaveSettings} className="px-4 py-2 rounded-lg bg-gradient-theme text-primary-action-text font-bold hover:opacity-90 transition-colors">
                                 Save
                             </button>
                         </div>
@@ -238,8 +237,8 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
             <div className="p-4 border-b border-accent flex justify-between items-center">
                 <h1 className="text-xl font-bold text-text-primary">{coachSettings.name}</h1>
                 <div className="flex items-center space-x-1">
-                     <button onClick={() => setMode('chat')} className={`px-3 py-1 rounded-md text-sm ${mode === 'chat' ? 'bg-highlight text-white' : 'bg-accent text-light'}`}>Chat</button>
-                     <button onClick={() => setMode('image')} className={`px-3 py-1 rounded-md text-sm ${mode === 'image' ? 'bg-highlight text-white' : 'bg-accent text-light'}`}>Image Analysis</button>
+                     <button onClick={() => setMode('chat')} className={`px-3 py-1 rounded-md text-sm ${mode === 'chat' ? 'bg-gradient-theme text-white' : 'bg-accent text-light'}`}>Chat</button>
+                     <button onClick={() => setMode('image')} className={`px-3 py-1 rounded-md text-sm ${mode === 'image' ? 'bg-gradient-theme text-white' : 'bg-accent text-light'}`}>Image Analysis</button>
                      <button onClick={() => { setTempSettings(coachSettings); setIsSettingsOpen(true); }} className="p-2 rounded-full hover:bg-accent text-light" title="Companion Settings">{ICONS.settings}</button>
                 </div>
             </div>
@@ -257,7 +256,7 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
                                 )}
                             </div>
                         )}
-                        <div className={`p-3 rounded-lg max-w-lg ${msg.sender === 'user' ? 'bg-highlight text-white' : 'bg-accent text-text-primary'}`}>
+                        <div className={`p-3 rounded-lg max-w-lg ${msg.sender === 'user' ? 'bg-gradient-theme text-white' : 'bg-accent text-text-primary'}`}>
                             <p className="whitespace-pre-wrap">{msg.text}</p>
                             {msg.imageUrl && <img src={msg.imageUrl} alt="Uploaded for analysis" className="mt-2 rounded-lg max-w-xs" />}
                         </div>
@@ -279,7 +278,7 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
                 {chatSummary && (
                     <div className="mb-2 p-2 bg-primary rounded-lg text-sm text-text-primary flex justify-between items-center gap-2">
                         <p>I noticed you mentioned: <strong className="text-highlight">"{chatSummary}"</strong>. Would you like to save this to your health notes?</p>
-                        <button onClick={handleSaveNote} className="bg-primary-action text-primary-action-text px-3 py-1 rounded-md text-xs font-bold whitespace-nowrap">Save Note</button>
+                        <button onClick={handleSaveNote} className="bg-gradient-theme text-primary-action-text px-3 py-1 rounded-md text-xs font-bold whitespace-nowrap">Save Note</button>
                     </div>
                 )}
                 {mode === 'image' && (
@@ -319,7 +318,7 @@ const AICompanion: React.FC<AICompanionProps> = ({ userProfile, onProfileUpdate 
                         className="flex-1 bg-transparent text-text-primary focus:outline-none px-2"
                         disabled={isLoading}
                     />
-                    <button onClick={handleSendMessage} disabled={isLoading || (!input.trim() && !imageFile)} className="p-2 rounded-full bg-highlight text-white hover:opacity-90 disabled:bg-gray-500 transition-colors">
+                    <button onClick={handleSendMessage} disabled={isLoading || (!input.trim() && !imageFile)} className="p-2 rounded-full bg-gradient-theme text-white hover:opacity-90 disabled:bg-gray-500 transition-colors">
                         {ICONS.send}
                     </button>
                 </div>

@@ -348,7 +348,7 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
                         ))}
                     </div>
                     {bpReading && <BloodPressureMeter systolic={bpReading.systolic} diastolic={bpReading.diastolic} />}
-                    <button onClick={handleAnalysis} disabled={isLoading} className="w-full mt-6 bg-primary-action text-primary-action-text font-bold py-3 rounded-lg hover:opacity-90 disabled:bg-gray-500 transition-colors">
+                    <button onClick={handleAnalysis} disabled={isLoading} className="w-full mt-6 bg-gradient-theme text-primary-action-text font-bold py-3 rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors">
                         {isLoading ? 'Analyzing...' : 'Analyze My Health'}
                     </button>
                 </div>
@@ -409,7 +409,7 @@ const HealthCheck: React.FC<HealthCheckProps> = ({ userProfile, onProfileUpdate,
                             </div>
                          ))}
                      </div>
-                    <button onClick={() => onViewReport(analysisResult)} className="w-full mt-4 bg-primary-action text-primary-action-text font-bold py-3 rounded-lg hover:opacity-90 transition-opacity">
+                    <button onClick={() => onViewReport(analysisResult)} className="w-full mt-4 bg-gradient-theme text-primary-action-text font-bold py-3 rounded-lg hover:opacity-90 transition-opacity">
                         View Detailed Report
                     </button>
                 </div>

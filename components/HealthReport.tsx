@@ -1,4 +1,3 @@
-
 import React from 'react';
 import type { UserProfile, HealthRecord, RiskPrediction, Vitals } from '../types';
 import { ResponsiveContainer, LineChart, Line, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts';
@@ -111,7 +110,7 @@ const HealthReport: React.FC<HealthReportProps> = ({ report, userProfile }) => {
 
             <div className="flex justify-between items-start no-print">
                 <h1 className="text-3xl font-bold text-text-primary">Health Report</h1>
-                <button onClick={handlePrint} className="bg-highlight text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">
+                <button onClick={handlePrint} className="bg-gradient-theme text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">
                     Download PDF
                 </button>
             </div>
@@ -124,7 +123,7 @@ const HealthReport: React.FC<HealthReportProps> = ({ report, userProfile }) => {
                             {ICONS.logo}
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-text-primary print-text-black">The Oracle Health Report</h1>
+                            <h1 className="text-3xl font-bold text-text-primary print-text-black">AI Health Tracker Report</h1>
                             <p className="text-light print-text-gray-700">Personalized AI-Powered Analysis</p>
                         </div>
                     </div>

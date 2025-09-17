@@ -35,7 +35,7 @@ const App: React.FC = () => {
     if (appState === 'loading') {
         return (
             <div className="flex items-center justify-center h-screen bg-primary">
-                <div className="text-xl text-text-primary">Loading The Oracle...</div>
+                <div className="text-xl text-text-primary">Loading AI Health Tracker...</div>
             </div>
         );
     }

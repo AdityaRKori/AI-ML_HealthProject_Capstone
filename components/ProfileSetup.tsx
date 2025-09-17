@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import type { UserProfile, GeneticMarker } from '../types';
 import { COUNTRIES, ICONS, GENETIC_MARKERS_DATA } from '../constants';
@@ -93,12 +92,12 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({ onProfileSetup, existingPro
         <div className="min-h-screen flex items-center justify-center bg-primary p-4">
             <div className="w-full max-w-lg bg-secondary shadow-lg rounded-xl p-8 transition-all duration-500">
                 <div className="flex justify-center mb-6">
-                    <div className="w-24 h-24 text-highlight" aria-label="The Oracle Logo">
+                    <div className="w-24 h-24 text-highlight" aria-label="AI Health Tracker Logo">
                         {ICONS.logo}
                     </div>
                 </div>
                 <h1 className="text-3xl font-bold text-center text-text-primary mb-2">
-                    {existingProfile ? 'Update Your Profile' : 'Welcome to The Oracle'}
+                    {existingProfile ? 'Update Your Profile' : 'Welcome to Your AI Health Tracker'}
                 </h1>
                 <p className="text-center text-light mb-8">
                     {existingProfile ? 'Keep your health information up to date.' : "Let's set up your health profile."}
@@ -148,7 +147,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({ onProfileSetup, existingPro
                          <p className="text-sm text-light mb-4">List any known allergies to medications, food, or other substances.</p>
                          <div className="flex items-center gap-2">
                              <input type="text" value={currentAllergy} onChange={(e) => setCurrentAllergy(e.target.value)} placeholder="e.g., Penicillin, Peanuts" className="flex-grow bg-accent text-text-primary border-transparent rounded-md shadow-sm focus:ring-highlight focus:border-highlight p-3"/>
-                             <button type="button" onClick={handleAddAllergy} className="bg-highlight text-white font-bold py-3 px-4 rounded-lg hover:opacity-80 transition-opacity">+</button>
+                             <button type="button" onClick={handleAddAllergy} className="bg-gradient-theme text-white font-bold py-3 px-4 rounded-lg hover:opacity-80 transition-opacity">+</button>
                          </div>
                          <div className="mt-4 flex flex-wrap gap-2">
                              {allergies.map(allergy => (
@@ -191,7 +190,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({ onProfileSetup, existingPro
                                 Next
                             </button>
                         ) : (
-                             <button type="submit" className="bg-highlight text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">
+                             <button type="submit" className="bg-gradient-theme text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">
                                 {existingProfile ? 'Save Changes' : 'Create Profile'}
                             </button>
                         )}

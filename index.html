@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='28' stroke='%233B82F6' stroke-width='4' fill='none'/><path d='M32 12C32 12 40 24 40 32C40 40 32 52 32 52' stroke='%233B82F6' stroke-width='4' stroke-linecap='round' fill='none'/><path d='M32 12C32 12 24 24 24 32C24 40 32 52 32 52' stroke='%233B82F6' stroke-width='4' stroke-linecap='round' fill='none'/><circle cx='32' cy='32' r='4' fill='%233B82F6'/></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Oracle</title>
+    <title>AI Health Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       :root {
@@ -20,6 +20,9 @@
         --color-success: #10B981;
         --color-warning: #F59E0B;
         --color-danger: #EF4444;
+
+        --gradient-start: var(--color-highlight);
+        --gradient-end: var(--color-primary-action);
       }
 
       .light {
@@ -35,6 +38,15 @@
         --color-success: #10B981;
         --color-warning: #F59E0B;
         --color-danger: #EF4444;
+
+        --gradient-start: var(--color-primary-action);
+        --gradient-end: var(--color-highlight);
+      }
+
+      /* Gradient background class */
+      .bg-gradient-theme {
+        background-image: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+        color: var(--color-highlight-text);
       }
 
       /* Pulsing animation for map dots */

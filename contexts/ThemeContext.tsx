@@ -13,7 +13,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => {
     try {
-      const savedTheme = localStorage.getItem('oracle-theme') as Theme | null;
+      const savedTheme = localStorage.getItem('ai-health-tracker-theme') as Theme | null;
       return savedTheme || 'dark';
     } catch {
       return 'dark';
@@ -24,7 +24,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
-    localStorage.setItem('oracle-theme', theme);
+    localStorage.setItem('ai-health-tracker-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {

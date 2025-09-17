@@ -214,27 +214,6 @@ export async function getAITrendAnalysis(healthHistory: HealthRecord[]): Promise
 }
 
 
-export async function validateImageType(base64Image: string, mimeType: string, expectedType: ImageType): Promise<boolean> {
-    const prompt = `Analyze the content of this image. Classify it as one of the following categories: "Chest X-Ray", "Skin Lesion", "Animal", "Object", "Text Document", "Other". Respond with only the single most appropriate category name from this list.`;
-    const imagePart = { inlineData: { mimeType, data: base64Image } };
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: { parts: [{ text: prompt }, imagePart] },
-            config: { temperature: 0.0, maxOutputTokens: 10 }
-        });
-        
-        const classification = response.text?.trim().toLowerCase() ?? '';
-        const expectedClassification = expectedType.replace('-', ' ').toLowerCase();
-        
-        return classification.includes(expectedClassification);
-    } catch (error) {
-        console.error("Failed to validate image type:", error);
-        return false;
-    }
-}
-
-
 export async function getSummaryFromChat(chatHistory: { sender: 'user' | 'bot'; text: string }[]): Promise<string | null> {
     const userMessages = chatHistory.filter(m => m.sender === 'user').map(m => m.text).join('\n');
     if (userMessages.length < 50) return null;
@@ -316,18 +295,24 @@ export async function getImageAnalysis(prompt: string, base64Image: string, mime
     const analysisType = imageType === 'chest-x-ray' ? 'chest x-ray' : 'skin lesion';
     
     const fullPrompt = `
-        You are an expert AI medical imaging assistant. Your task is to analyze the provided image and provide a detailed, evidence-based report based on the preliminary ML model findings. Your analysis MUST adhere to WHO guidelines and standards.
+        You are an expert AI medical imaging assistant. Your task is to analyze the provided image and provide a detailed, evidence-based report based on the preliminary ML model findings.
 
         **Context:**
         - Image Type: ${analysisType}
         - Preliminary ML Finding: ${prompt}
 
         **Your Task:**
+        Generate a report with the following four sections.
+
         1.  **Disclaimer:** Start with a clear, bolded disclaimer: "**Disclaimer: This is an AI-powered analysis and not a medical diagnosis. Please consult a qualified healthcare professional.**"
-        2.  **Visual Indicator Analysis:** Based on the preliminary finding, explain *what visual evidence in the image* could lead to such a conclusion. Be specific. For example:
-            - For Tuberculosis: "I am observing a potential cavitation (a hollow, shadowed space) in the upper-left lobe of the lung field, which is a common indicator for Tuberculosis."
-            - For Melanoma: "The lesion shows some asymmetry and has irregular borders, which are characteristics often evaluated when assessing for Melanoma."
+
+        2.  **Detailed Visual Analysis:** Describe the specific visual features in the image that support the preliminary finding. Be precise and descriptive, as if you are a specialist explaining the image. For example:
+            - If it's a chest x-ray suggesting Tuberculosis: "I am observing what appears to be a cavitation (a hollow, dark gap) in the upper-right lobe of the lung field. Additionally, there are signs of opacity in the surrounding area, which can be indicative of inflammation associated with TB."
+            - If it's a skin lesion suggesting an insect bite: "The lesion presents with localized swelling and significant erythema (redness). There is a visible central punctum (the bite mark itself), and no signs of widespread infection like purulent discharge (pus), which points towards a reaction to an insect bite rather than a primary bacterial infection."
+            - If it's a skin lesion suggesting Melanoma: "The lesion exhibits several of the ABCDE characteristics: Asymmetry, irregular Borders, and uneven Color distribution. This combination of features is a key reason for the preliminary finding."
+
         3.  **Cause & Prevention (WHO-based):** Briefly explain the common causes of the potential condition and provide 2-3 key, actionable prevention tips based on WHO guidelines.
+
         4.  **Next Steps:** Provide clear, safe, and responsible next steps. This should always include consulting a doctor. For example: "The recommended next step is to share this image and preliminary report with a radiologist or your primary care physician for a definitive diagnosis and treatment plan."
     `;
 

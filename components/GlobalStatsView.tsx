@@ -229,7 +229,7 @@ const GlobalStatsView: React.FC<GlobalStatsViewProps> = ({ userProfile }) => {
                             placeholder="Search for a disease (e.g., Measles)"
                             className="flex-grow bg-accent text-text-primary border-transparent rounded-md shadow-sm focus:ring-highlight focus:border-highlight p-3"
                          />
-                         <button onClick={handleSearch} disabled={isSearching} className="bg-highlight text-white font-bold py-3 px-5 rounded-lg hover:opacity-90 disabled:bg-gray-500">
+                         <button onClick={handleSearch} disabled={isSearching} className="bg-gradient-theme text-white font-bold py-3 px-5 rounded-lg hover:opacity-90 disabled:opacity-50">
                              {isSearching ? '...' : 'Search'}
                          </button>
                      </div>
